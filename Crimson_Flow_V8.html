@@ -61,6 +61,33 @@ header{display:grid;grid-template-columns:minmax(130px,1fr) auto minmax(130px,1f
 .panel:focus-visible{outline:2px solid #ff5475;outline-offset:3px}
 body{grid-template-rows:minmax(0,1fr)}
 body>header,#lab-footer{display:none}
+
+.hero h1 .red {
+  background:linear-gradient(105deg,#e90530 40%,#ff7589 48%,#fff1ee 50%,#ff526f 52%,#e90530 60%);
+  background-size:300% 100%;
+  background-position:var(--title-sweep,100%) center;
+  background-clip:text;
+  color:transparent;
+  text-shadow:none;
+}
+.anchor-art.red-art {filter:drop-shadow(0 0 10px rgb(255 8 55 / var(--frame-glow,.3)))}
+.free.red-art {filter:drop-shadow(0 0 7px rgb(255 23 64 / var(--reflection,0)))}
+.project-art {position:relative}
+.project-art::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(108deg,transparent 43%,#ff12342a 48%,#ff9aaebf 50%,#ff12344a 51%,transparent 56%);
+  background-size:300% 100%;
+  background-position:var(--art-sweep,100%) center;
+}
+.scene:nth-child(5) .panel.active {
+  border-color:#ff4766;
+  box-shadow:0 16px 35px #000b,0 0 5px #ff254f99,0 0 24px #f307384d;
+}
+.end h2 {text-shadow:0 0 5px rgb(255 89 111 / var(--farewell,0)),0 0 24px rgb(255 12 60 / var(--farewell,0))}
+@media(forced-colors:active){.hero h1 .red{color:CanvasText}}
 </style></head><body><header><div class="identity"><div class="brand">CRIMSON<span> / FLOW</span></div><div class="sub">SPATIAL ODYSSEY · V8</div></div><div class="mode-group" role="group" aria-label="Trajetória da câmera"><button data-mode="flow" aria-pressed="false">Flow</button><button data-mode="spatial" aria-pressed="true">Spatial</button><button data-mode="cinematic" aria-pressed="false">Cinematic</button></div><div class="lab-actions"><button id="content" aria-pressed="true" title="Mostrar ou ocultar informações">Conteúdo</button><button id="inspect" aria-expanded="false" aria-controls="inspector">Ajustes</button><button id="fullscreen" class="icon-btn" aria-label="Tela cheia" title="Tela cheia">⛶</button></div></header>
 <main id="stage"><div id="world" aria-hidden="true"><div class="graphite"></div><div id="free-layer"></div><div id="anchor-layer"></div><div class="read-field"></div><div class="scene-light"></div><div class="vignette"></div></div><div id="scroll" tabindex="0" aria-label="Portfólio de demonstração"></div><div class="track"><i></i></div><nav class="nav" aria-label="Seções do percurso"></nav><div class="scene-note" id="scene-note">ROLE ↓ / CÂMERA CONTÍNUA</div><div class="debug-safe"><span>Limite visível · área da câmera</span></div><aside class="inspector" id="inspector" hidden aria-label="Painel de inspeção"><div class="inspect-top"><h3>Controles do cenário</h3><button id="close-inspect" aria-label="Fechar inspeção">×</button></div><p>Ajuste a visualização sem interromper a exploração. Alterne a trajetória no topo ou avance pelo controle inferior.</p><div class="inspect-controls"><button id="depth" aria-pressed="true">Profundidade 3D</button><button id="motion" aria-pressed="true">Movimento</button><button id="red-art" aria-pressed="true">Tribais carmesim</button><button id="gray-art" aria-pressed="true">Camada grafite</button><button id="debug" aria-pressed="false">Limites dos assets</button><button id="reset">Reiniciar percurso</button></div><div class="metrics" id="metrics"></div><div class="inspect-help">As linhas tracejadas são guias de inspeção. Os recortes da arte original ficam fora da tela; os ornamentos livres têm silhuetas fechadas. Nenhuma deformação é aplicada.</div></aside></main>
 <footer id="lab-footer"><div class="left"><label class="sr-only" for="section-select">Ir para seção</label><select id="section-select" aria-label="Ir para seção"></select><div id="status" class="sr-only">01 / APRESENTAÇÃO</div><div id="mode-caption">SPATIAL / PROFUNDIDADE</div></div><input id="scrub" type="range" min="0" max="10000" value="0" step="1" aria-label="Progresso da navegação"><span id="percent">0,0%</span></footer>
@@ -127,8 +154,17 @@ function draw(now){frame=0;if(document.hidden||W<2||H<2||positions.length!==7)re
  // Source-cropped assets cannot enter the viewport with their cut top or left edges. No rotation or skew is applied.
  // The lower asset is pre-rotated by exactly 180 degrees and its cut edges stay outside the bottom/right viewport.
  const mobile=W<=760;const size=Math.min(W*(mobile?.85:.53),H*(mobile?.73:.97));const ah=size*696/886;const margin=4;
+ const neonMotion=motion&&!mq.matches;
+ const sweep=smooth(pp/.48);
+ const closing=smooth((pp-5.50)/.50);
+ stage.style.setProperty('--title-sweep',neonMotion?(100-100*sweep)+'%':'66%');
+ stage.style.setProperty('--frame-glow',neonMotion?.24+.55*Math.max(Math.sin(Math.PI*sweep),closing):.32);
+ stage.style.setProperty('--farewell',neonMotion?Math.sin(Math.PI*smooth((pp-5.76)/.24)):.24);
  anchors.forEach(a=>{const phase=a.end?smooth((6-pp)/.94):smooth(pp/.72);const ox=phase*(size+W*.06),oy=phase*(ah+H*.06);const x=a.side==='tl'?-margin-ox*.10:W-size+margin+ox;const yy=a.side==='tl'?-margin-oy:H-ah+margin+oy*.10;const vis=x<W&&x+size>0&&yy<H&&yy+ah>0;put(a.el,x,yy,size,ah,vis);if(vis){visibleCount++;if(a.side==='tl'&&(x>-.9||yy>-.9))safe=false;if(a.side==='br'&&(x+size<W+.9||yy+ah<H+.9))safe=false}});
- for(const o of sceneObjects){const a=project(o,c),hh=a.size*560/660;const x=a.x-a.size*.5,yy=a.y-hh*.5;const pad=a.size*.24;const vis=x<W+pad&&x+a.size>-pad&&yy<H+pad&&yy+hh>-pad;put(o.el,x,yy,a.base,a.base*560/660,vis,a.k);o.el.style.opacity=o.gray?'.56':o.d>1.15?'.84':'1';if(vis)visibleCount++}
+ for(const o of sceneObjects){const a=project(o,c),hh=a.size*560/660;const x=a.x-a.size*.5,yy=a.y-hh*.5;const pad=a.size*.24;const vis=x<W+pad&&x+a.size>-pad&&yy<H+pad&&yy+hh>-pad;if(vis&&!o.gray){
+   const reflection=1-smooth(Math.abs(pp-o.at)/.44);
+   o.el.style.setProperty('--reflection',neonMotion?reflection*.75:.25);
+ }put(o.el,x,yy,a.base,a.base*560/660,vis,a.k);o.el.style.opacity=o.gray?'.56':o.d>1.15?'.84':'1';if(vis)visibleCount++}
  for(const o of dots){const a=project({...o,size:.13},c),ww=clamp(a.size,55,160),hh=ww*1.15;put(o.el,a.x-ww/2,a.y-hh/2,ww,hh,a.y+hh>0&&a.y-hh<H)}
  // Complete entrances by the first readable position, including tall mobile scenes.
  const animated=motion&&depth&&!mq.matches;
@@ -139,6 +175,7 @@ function draw(now){frame=0;if(document.hidden||W<2||H<2||positions.length!==7)re
  const approach=clamp(1-(arrival-y)/Math.max(1,H*.75),0,1);
  projectArt.forEach((art,i)=>{
    const progress=smooth((approach-i*.18)/.82);
+   art.style.setProperty('--art-sweep',neonMotion?(100-100*progress)+'%':'66%');
    art.style.translate=animated?`0 ${(12*(1-progress)).toFixed(2)}px`:'none';
  });
  stage.style.setProperty('--ambient',content&&selected&&selected.closest('.scene')===sections[idx]?'0.20':'0.07');if(blending)schedule();const note=mode==='flow'?'FLOW / PERCURSO VERTICAL':mode==='spatial'?'SPATIAL / PLANOS EM PROFUNDIDADE':'CINEMATIC / APROXIMAÇÃO DA VITRINE';$('#scene-note').textContent=motion?note:'MODO ESTÁTICO / SEM MOVIMENTO DA CÂMERA';

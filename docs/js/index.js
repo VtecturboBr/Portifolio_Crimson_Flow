@@ -1,5 +1,57 @@
 const paginas = [...document.querySelectorAll('.pagina')];
 const links = [...document.querySelectorAll('.navegacao a')];
+const curriculo = document.getElementById('curriculo');
+const neon = curriculo.querySelector('.crimson-neon');
+const retrato = curriculo.querySelector('.retrato');
+const movimentoReduzido = window.matchMedia('(prefers-reduced-motion: reduce)');
+let curriculoAberto = false;
+
+function abrirCurriculo() {
+  if (curriculoAberto) return;
+  curriculoAberto = true;
+  const espera = movimentoReduzido.matches ? 0 : 450;
+  Promise.all([neon.decode(), new Promise(resolve => setTimeout(resolve, espera))])
+    .then(() => neon.classList.add('acesa'), () => {});
+
+  const moldura = new Image();
+  moldura.src = 'assets/images/Borda.png';
+  Promise.allSettled([moldura.decode(), retrato.querySelector('img').decode()]).then(() => {
+    if (!curriculo.hidden && !movimentoReduzido.matches) {
+      retrato.classList.add('entrada-retrato');
+      retrato.addEventListener('animationend', () => retrato.classList.remove('entrada-retrato'), { once: true });
+    }
+    retrato.classList.add('foto-pronta');
+  });
+  if (movimentoReduzido.matches) return;
+
+  if (!('IntersectionObserver' in window)) return;
+  const secoes = curriculo.querySelectorAll('.curriculo-grid > section');
+  const observador = new IntersectionObserver(entradas => {
+    for (const entrada of entradas) {
+      if (entrada.intersectionRatio >= .12) revelar(entrada.target);
+    }
+  }, { threshold: .12 });
+
+  function revelar(secao) {
+    observador.unobserve(secao);
+    secao.classList.remove('pendente');
+  }
+
+  secoes.forEach(secao => {
+    secao.classList.add('pendente');
+    observador.observe(secao);
+  });
+  curriculo.addEventListener('focusin', evento => {
+    const secao = evento.target.closest('section.pendente');
+    if (secao) revelar(secao);
+  });
+  movimentoReduzido.addEventListener('change', evento => {
+    if (evento.matches) {
+      retrato.classList.remove('entrada-retrato');
+      secoes.forEach(revelar);
+    }
+  });
+}
 const nomes = { curriculo: 'Currículo', projetos: 'V-Tec Motors', scrum: 'Scrum Dungeon', lin0: 'LIN0' };
 
 function atualizarPagina(evento) {
@@ -7,6 +59,8 @@ function atualizarPagina(evento) {
   const ativa = paginas.find(pagina => `#${pagina.id}` === location.hash) || paginas[0];
   paginas.forEach(pagina => { pagina.hidden = pagina !== ativa; });
   document.body.dataset.pagina = ativa.id;
+  if (ativa === curriculo) abrirCurriculo();
+  else retrato.classList.remove('entrada-retrato');
   links.forEach(link => {
     if (link.hash === `#${ativa.id}`) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
@@ -19,9 +73,6 @@ function atualizarPagina(evento) {
 }
 window.addEventListener('hashchange', atualizarPagina);
 atualizarPagina();
-
-const neon = document.querySelector('.crimson-neon');
-neon.decode().then(() => neon.classList.add('acesa'), () => {});
 
 if (location.protocol === 'file:' || ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
   const teste = document.querySelector('.crimson-teste');

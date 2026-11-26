@@ -54,7 +54,8 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
 .retrato::before { content: ""; position: absolute; top: -1px; left: -1px; width: 44px; height: 3px; background: var(--destaque); }
 .retrato img { width: 100%; height: 273px; object-fit: cover; object-position: 22% 44%; filter: grayscale(1); }
 .curriculo-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; }
-.curriculo-adicional { grid-column: 1 / -1; }
+.experiencia-curriculo { grid-column: 1 / -1; }
+.relatos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(28px, 4vw, 64px); }
 .contatos { list-style: none; padding: 0; margin: 0; }
 .contatos li + li { margin-top: 18px; }
 .contato-tipo { display: block; color: #aaa99f; font-size: 9px; letter-spacing: 1px; margin-bottom: 3px; }
@@ -187,6 +188,11 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .lin0-mapa img { aspect-ratio: 4 / 3; }
 }
 @media screen {
+  @media (scripting: enabled) {
+    #tech-text-curriculo { width: 100%; height: clamp(100px, 14vw, 156px); position: relative; }
+    #titulo-curriculo { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    #curriculo .retrato:not(.foto-pronta) { opacity: 0; }
+  }
   #tech-text-curriculo:has(canvas) { width: 100%; height: clamp(100px, 14vw, 156px); position: relative; }
   .hero-texto:has(#tech-text-curriculo canvas) #titulo-curriculo {
     position: absolute;
@@ -199,6 +205,7 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
 }
 @media print {
   #tech-text-curriculo { display: none; }
+  #curriculo .bloco, #curriculo .retrato { opacity: 1 !important; animation: none !important; transition: none !important; transform: none !important; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -254,7 +261,15 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .crimson-teste output { font-variant-numeric: tabular-nums; }
   .crimson-teste input { display: block; width: 100%; margin: 4px 0 0; accent-color: var(--destaque); }
   @media (prefers-reduced-motion: no-preference) {
-    .crimson-neon { transition: opacity 650ms cubic-bezier(.23, 1, .32, 1); }
+    .crimson-neon { transition: opacity 1.1s cubic-bezier(.23, 1, .32, 1); }
+    #curriculo .retrato.entrada-retrato { animation: entrada-retrato 770ms cubic-bezier(.16, 1, .3, 1) 180ms backwards; }
+    @keyframes entrada-retrato {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #curriculo .bloco { transition: opacity 400ms ease-out, transform 400ms cubic-bezier(.16, 1, .3, 1); transition-delay: var(--atraso, 0ms); }
+    #curriculo .bloco.pendente { opacity: 0; transform: translateY(8px); transition: none; }
+    #curriculo .bloco:focus-within { opacity: 1; transform: none; transition: none; }
   }
   #curriculo .hero { grid-template-columns: minmax(0, 1fr) clamp(220px, 21vw, 270px); gap: clamp(20px, 3vw, 44px); padding: 26px var(--margem-curriculo); }
   #curriculo h1 { margin: 0; }
@@ -264,14 +279,15 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   #curriculo .retrato img { position: absolute; inset: 13% 14% 21% 13%; width: 73%; height: 66%; object-position: 7% center; clip-path: polygon(8% 0, 100% 4%, 92% 100%, 0 95%); filter: saturate(.7) sepia(.12); }
   #curriculo .curriculo-grid {
     flex: 1;
-    align-content: space-between;
-    column-gap: clamp(36px, 5vw, 80px);
-    row-gap: clamp(32px, 4vw, 64px);
+    align-content: start;
+    column-gap: clamp(20px, 2.5vw, 40px);
+    row-gap: clamp(56px, 5vw, 88px);
     padding: clamp(30px, 4vw, 64px) var(--margem-curriculo) clamp(44px, 6vw, 96px);
   }
   #curriculo .curriculo-grid > .bloco { min-width: 0; margin: 0; padding: 0; border: 0; }
-  #curriculo .bloco p { max-width: 62ch; font-size: clamp(16px, 1.4vw, 22px); line-height: 1.65; }
-  #curriculo .bloco h3 { font-size: clamp(16px, 1.45vw, 23px); line-height: 1.35; }
+  #curriculo .bloco p { max-width: 62ch; font-size: clamp(17px, 1.4vw, 22px); line-height: 1.6; }
+  #curriculo .bloco h3 { font-size: clamp(19px, 1.45vw, 24px); line-height: 1.35; margin-bottom: 12px; }
+  #curriculo .contato-curriculo > p { margin-top: 20px; }
   #curriculo .formacao { flex-wrap: wrap; justify-content: flex-start; gap: 16px; padding-left: 18px; }
   #curriculo .link-texto { font-size: clamp(15px, 1.2vw, 19px); }
   #curriculo .contatos { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
@@ -346,6 +362,13 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   #scrum h1 > span { font-size: 48px; }
 }
 @media screen and (min-width: 701px) {
+  #curriculo .curriculo-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .curriculo-grid > section { grid-column: span 6; }
+  .curriculo-grid > section:first-child { grid-column: span 7; }
+  .curriculo-grid > .contato-curriculo { grid-column: span 5; }
+  .curriculo-grid > :is(.contato-curriculo, .conhecimentos) { --atraso: 60ms; }
+  .curriculo-grid > :is(.experiencia-curriculo, section:last-child) { grid-column: 1 / -1; }
+  #curriculo .bloco h2 { font-size: clamp(32px, 2.9vw, 46px); }
   #curriculo .hero {
     grid-template-columns: minmax(0, 1fr) clamp(215px, 27vw, 440px);
     align-items: center;
@@ -353,10 +376,14 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
     padding: clamp(62px, 8vw, 128px) clamp(28px, 3vw, 64px) clamp(148px, 16.5vw, 276px);
   }
   #curriculo .hero-texto { width: 100%; transform: translateY(clamp(12px, 1.25vw, 24px)); }
+  @media (scripting: enabled) {
+    #tech-text-curriculo { height: clamp(156px, 15vw, 300px); }
+  }
   #tech-text-curriculo:has(canvas) { height: clamp(156px, 15vw, 300px); }
 }
 
 @media screen and (max-width: 700px) {
+  .relatos { grid-template-columns: minmax(0, 1fr); }
   .navegacao { grid-template-columns: repeat(2,1fr); }
   .navegacao a { font-size: 10px; padding: 15px 12px; }
   .navegacao a:nth-child(3) { border-left: 0; border-top: 1px solid #454545; }

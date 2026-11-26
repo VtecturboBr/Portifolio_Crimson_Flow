@@ -21,6 +21,16 @@ retrato.addEventListener('pointerleave', () => {
 
 let curriculoAberto = false;
 
+for (const bloco of curriculo.querySelectorAll('.curriculo-grid > section')) {
+  bloco.addEventListener('pointermove', evento => {
+    if (evento.pointerType !== 'mouse' || !permiteGiro.matches) return;
+    const area = bloco.getBoundingClientRect();
+    const posicao = (evento.clientX - area.left) / area.width - .5;
+    bloco.style.setProperty('--ajuste', `${posicao * 3}deg`);
+  });
+  bloco.addEventListener('pointerleave', () => bloco.style.removeProperty('--ajuste'));
+}
+
 function abrirCurriculo() {
   if (curriculoAberto) return;
   curriculoAberto = true;
@@ -68,6 +78,46 @@ function abrirCurriculo() {
   });
 }
 const nomes = { curriculo: 'Currículo', projetos: 'V-Tec Motors', scrum: 'Scrum Dungeon', lin0: 'LIN0' };
+const passagem = document.querySelector('.passagem-yoru');
+let ultimaRolagem = window.scrollY;
+let retornoAoCurriculo;
+
+function voltarPeloBreu() {
+  passagem.dataset.fase = 'subida';
+  retornoAoCurriculo = setTimeout(() => {
+    const fimDoCurriculo = window.scrollY + passagem.getBoundingClientRect().top - window.innerHeight;
+    window.scrollTo(0, Math.min(window.scrollY, fimDoCurriculo - 4));
+    ultimaRolagem = window.scrollY;
+    delete passagem.dataset.fase;
+  }, 450);
+}
+
+function acompanharPassagem() {
+  const anterior = ultimaRolagem;
+  ultimaRolagem = window.scrollY;
+  if (curriculo.hidden) {
+    clearTimeout(retornoAoCurriculo);
+    delete passagem.dataset.fase;
+    return;
+  }
+  const topo = passagem.getBoundingClientRect().top;
+  const fase = passagem.dataset.fase;
+  if (!fase && topo <= window.innerHeight + 1) {
+    passagem.dataset.fase = 'descida';
+  } else if ((fase === 'descida' || fase === 'fundo') && ultimaRolagem < anterior && topo > 1) {
+    voltarPeloBreu();
+  }
+}
+
+passagem.addEventListener('animationend', evento => {
+  if (!evento.target.matches('.breu-yoru img') || passagem.dataset.fase !== 'descida') return;
+  // A troca de posi??o acontece enquanto o preto ainda cobre toda a tela.
+  passagem.scrollIntoView({ block: 'start', behavior: 'instant' });
+  ultimaRolagem = window.scrollY;
+  passagem.dataset.fase = 'fundo';
+});
+window.addEventListener('scroll', acompanharPassagem, { passive: true });
+window.addEventListener('resize', acompanharPassagem);
 
 function atualizarPagina(evento) {
   if (evento && location.hash === '#conteudo') return;
@@ -82,9 +132,10 @@ function atualizarPagina(evento) {
   });
   document.title = `${nomes[ativa.id]} — Alef Gabriel`;
   if (evento) {
-    ativa.querySelector('h1').focus({ preventScroll: true });
+    (ativa.querySelector('h1') || ativa).focus({ preventScroll: true });
     window.scrollTo(0, 0);
   }
+  acompanharPassagem();
 }
 window.addEventListener('hashchange', atualizarPagina);
 atualizarPagina();

@@ -19,3 +19,30 @@ function atualizarPagina(evento) {
 }
 window.addEventListener('hashchange', atualizarPagina);
 atualizarPagina();
+
+const neon = document.querySelector('.crimson-neon');
+neon.decode().then(() => neon.classList.add('acesa'), () => {});
+
+if (location.protocol === 'file:' || ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
+  const teste = document.querySelector('.crimson-teste');
+  const nivel = teste.querySelector('input');
+  const percentual = teste.querySelector('output');
+  const arte = neon.parentElement;
+  const sombraNormal = 2 / 15;
+
+  function ajustarClaridade() {
+    const valor = nivel.valueAsNumber;
+    const sombra = valor <= 55
+      ? 1 - (1 - sombraNormal) * valor / 55
+      : sombraNormal * Math.max(0, (75 - valor) / 20);
+    const brilho = Math.max(0, (valor - 75) / 25);
+
+    arte.style.setProperty('--crimson-sombra', sombra);
+    arte.style.setProperty('--crimson-luz', brilho);
+    percentual.value = `${valor}%`;
+  }
+
+  nivel.addEventListener('input', ajustarClaridade);
+  ajustarClaridade();
+  teste.hidden = false;
+}

@@ -1,0 +1,14 @@
+{
+  "name": "portfolio-alef",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/tech-text/index.jsx --bundle --jsx=automatic --minify --legal-comments=eof --outfile=docs/js/tech-text.js"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

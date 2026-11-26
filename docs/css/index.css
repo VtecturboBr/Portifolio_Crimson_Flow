@@ -53,7 +53,6 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
 .hero h1 { margin-top: 25px; }
 .hero h1 > span { display: block; color: #adada7; }
 .ponto-final { color: var(--destaque); }
-.apresentacao { margin-top: 26px; font-size: 17px; line-height: 1.6; }
 .retrato { position: relative; padding: 9px; border: 1px solid #4a4a44; transform: rotate(3deg); background: #232322; }
 .retrato::before { content: ""; position: absolute; top: -1px; left: -1px; width: 44px; height: 3px; background: var(--destaque); }
 .retrato img { width: 100%; height: 273px; object-fit: cover; object-position: 22% 44%; filter: grayscale(1); }
@@ -176,7 +175,6 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .sobretitulo { font-size: 9px; letter-spacing: 1px; }
   h1 { font-size: clamp(37px, 9.5vw, 60px); letter-spacing: -2px; }
   .hero h1 { margin-top: 20px; }
-  .apresentacao { font-size: 15px; margin-top: 20px; }
   .retrato { width: 190px; justify-self: center; }
   .retrato img { height: 210px; }
   .faixa-disponibilidade { padding: 16px 24px; font-size: 11px; }
@@ -240,7 +238,7 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   body[data-pagina="projetos"] { background: radial-gradient(ellipse at 80% 20%, #381919, transparent 55%), #0a0d11; }
   body[data-pagina="scrum"] { background: radial-gradient(ellipse at 20% 15%, #392543, transparent 50%), radial-gradient(ellipse at 90% 60%, #293621, transparent 50%), #0b1010; --destaque: #e8c57a; }
   body[data-pagina="lin0"] { background: linear-gradient(#130609de, #0a090bed), url('../assets/images/lin0-background.png') center / cover fixed; }
-  .site { max-width: 1240px; }
+  .site { max-width: 1320px; }
   .barra-superior { min-height: 100px; }
   .navegacao { background: #0c0c0dd9; }
   .navegacao a { padding: 18px 22px; text-transform: uppercase; font: 12px var(--fonte-mono); letter-spacing: .5px; }
@@ -250,7 +248,6 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   #curriculo .hero { grid-template-columns: minmax(0, 1fr) 290px; gap: 26px; padding: 44px 42px 38px; }
   #curriculo h1 { margin: 0; }
   #curriculo .hero .sobretitulo { font-size: 9px; letter-spacing: 2px; color: #b5b5b5; }
-  #curriculo .apresentacao { display: inline-block; background: var(--destaque); color: #170007; padding: 15px 22px; clip-path: polygon(0 8%,100% 0,98% 92%,1% 100%); transform: rotate(-2deg); font: italic 700 13px/1.6 var(--fonte-mono); text-transform: uppercase; letter-spacing: 1px; }
   #curriculo .retrato { width: 100%; aspect-ratio: 1122 / 1402; padding: 0; border: 0; background: none; transform: none; }
   #curriculo .retrato::before { inset: 0; width: auto; height: auto; background: url('../assets/images/Borda.png') center / 100% 100% no-repeat; z-index: 1; pointer-events: none; }
   #curriculo .retrato img { position: absolute; inset: 13% 14% 21% 13%; width: 73%; height: 66%; object-position: 7% center; clip-path: polygon(8% 0, 100% 4%, 92% 100%, 0 95%); filter: saturate(.7) sepia(.12); }
@@ -337,7 +334,6 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .navegacao a:nth-child(4) { border-top: 1px solid #454545; }
   #curriculo .hero { grid-template-columns: minmax(0, 1fr); padding: 30px 22px; gap: 18px; }
   #curriculo .hero .sobretitulo { font-size: 7px; letter-spacing: .5px; }
-  #curriculo .apresentacao { font-size: 10px; padding: 12px 10px; }
   #curriculo .retrato { grid-column: 1 / -1; justify-self: center; width: min(250px, 100%); margin-top: 15px; }
   #curriculo .curriculo-grid { grid-template-columns: minmax(0,1fr); padding: 28px 22px; }
   #curriculo .lateral { border-right: 0; padding-right: 0; }
@@ -399,7 +395,6 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .bloco h2 { font-size: 14px; margin-bottom: 10px; }
   .bloco p { font-size: 10.5px; line-height: 1.6; }
   .hero h1 { margin-top: 12px; font-size: 32pt; }
-  .hero .apresentacao { margin-top: 15px; }
   .conhecimentos { margin-top: 24px; }
   .rotulo { margin-bottom: 15px; }
   .contatos li + li { margin-top: 12px; }

@@ -1,346 +1,339 @@
-'use client';
+// Adapted from React Bits. See LICENSE.react-bits.md.
+(() => {
+  const VERTEX = `#version 300 es
+  in vec2 aPosition;
+  uniform vec2 uTexel;
+  out vec2 vUv;
+  out vec2 vL;
+  out vec2 vR;
+  out vec2 vT;
+  out vec2 vB;
+  void main() {
+    vUv = aPosition * 0.5 + 0.5;
+    vL = vUv - vec2(uTexel.x, 0.0);
+    vR = vUv + vec2(uTexel.x, 0.0);
+    vT = vUv + vec2(0.0, uTexel.y);
+    vB = vUv - vec2(0.0, uTexel.y);
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+  }`;
 
-import { useEffect, useRef } from 'react';
+  const HEADER = `#version 300 es
+  precision highp float;
+  precision highp sampler2D;
+  in vec2 vUv;
+  in vec2 vL;
+  in vec2 vR;
+  in vec2 vT;
+  in vec2 vB;
+  out vec4 outColor;
+  `;
 
-import './GlowCursor.css';
-
-const VERTEX = `#version 300 es
-in vec2 aPosition;
-uniform vec2 uTexel;
-out vec2 vUv;
-out vec2 vL;
-out vec2 vR;
-out vec2 vT;
-out vec2 vB;
-void main() {
-  vUv = aPosition * 0.5 + 0.5;
-  vL = vUv - vec2(uTexel.x, 0.0);
-  vR = vUv + vec2(uTexel.x, 0.0);
-  vT = vUv + vec2(0.0, uTexel.y);
-  vB = vUv - vec2(0.0, uTexel.y);
-  gl_Position = vec4(aPosition, 0.0, 1.0);
-}`;
-
-const HEADER = `#version 300 es
-precision highp float;
-precision highp sampler2D;
-in vec2 vUv;
-in vec2 vL;
-in vec2 vR;
-in vec2 vT;
-in vec2 vB;
-out vec4 outColor;
-`;
-
-const SPLAT = `${HEADER}
-uniform sampler2D uTarget;
-uniform float uAspect;
-uniform vec2 uA;
-uniform vec2 uB;
-uniform float uRadius;
-uniform float uWide;
-uniform vec3 uValue;
-uniform float uMode;
-uniform float uStrength;
-float erf(float x) {
-  float x2 = x * x;
-  float a = 0.147;
-  return sign(x) * sqrt(1.0 - exp(-x2 * (1.2732395 + a * x2) / (1.0 + a * x2)));
-}
-float sweep(float along, float length, float across, float radius) {
-  return exp(-across * across / (radius * radius)) * 0.5 * (erf(along / radius) - erf((along - length) / radius));
-}
-void main() {
-  vec2 p = vec2(vUv.x * uAspect, vUv.y);
-  vec2 a = vec2(uA.x * uAspect, uA.y);
-  vec2 ab = vec2(uB.x * uAspect, uB.y) - a;
-  float len = length(ab);
-  vec2 dir = len > 1e-6 ? ab / len : vec2(1.0, 0.0);
-  vec2 ap = p - a;
-  vec3 base = texture(uTarget, vUv).xyz;
-  if (uMode > 1.5) {
-    float along = dot(ap, dir);
-    float across = dot(ap, vec2(-dir.y, dir.x));
-    if (uMode > 2.5) {
-      outColor = vec4(mix(base, uValue, sweep(along, len, across, uRadius) * uStrength), 1.0);
+  const SPLAT = `${HEADER}
+  uniform sampler2D uTarget;
+  uniform float uAspect;
+  uniform vec2 uA;
+  uniform vec2 uB;
+  uniform float uRadius;
+  uniform float uWide;
+  uniform vec3 uValue;
+  uniform float uMode;
+  uniform float uStrength;
+  float erf(float x) {
+    float x2 = x * x;
+    float a = 0.147;
+    return sign(x) * sqrt(1.0 - exp(-x2 * (1.2732395 + a * x2) / (1.0 + a * x2)));
+  }
+  float sweep(float along, float length, float across, float radius) {
+    return exp(-across * across / (radius * radius)) * 0.5 * (erf(along / radius) - erf((along - length) / radius));
+  }
+  void main() {
+    vec2 p = vec2(vUv.x * uAspect, vUv.y);
+    vec2 a = vec2(uA.x * uAspect, uA.y);
+    vec2 ab = vec2(uB.x * uAspect, uB.y) - a;
+    float len = length(ab);
+    vec2 dir = len > 1e-6 ? ab / len : vec2(1.0, 0.0);
+    vec2 ap = p - a;
+    vec3 base = texture(uTarget, vUv).xyz;
+    if (uMode > 1.5) {
+      float along = dot(ap, dir);
+      float across = dot(ap, vec2(-dir.y, dir.x));
+      if (uMode > 2.5) {
+        outColor = vec4(mix(base, uValue, sweep(along, len, across, uRadius) * uStrength), 1.0);
+        return;
+      }
+      vec3 add = vec3(uValue.xy * sweep(along, len, across, uRadius), uValue.z * sweep(along, len, across, uWide));
+      outColor = vec4(base + add, 1.0);
       return;
     }
-    vec3 add = vec3(uValue.xy * sweep(along, len, across, uRadius), uValue.z * sweep(along, len, across, uWide));
-    outColor = vec4(base + add, 1.0);
-    return;
-  }
-  float h = clamp(dot(ap, ab) / max(dot(ab, ab), 1e-9), 0.0, 1.0);
-  vec2 d = ap - ab * h;
-  float r2 = dot(d, d);
-  float falloff = exp(-r2 / (uRadius * uRadius));
-  float wide = exp(-r2 / (uWide * uWide));
-  vec3 result = uMode > 0.5 ? mix(base, uValue, falloff * uStrength) : base + vec3(uValue.xy * falloff, uValue.z * wide);
-  outColor = vec4(result, 1.0);
-}`;
+    float h = clamp(dot(ap, ab) / max(dot(ab, ab), 1e-9), 0.0, 1.0);
+    vec2 d = ap - ab * h;
+    float r2 = dot(d, d);
+    float falloff = exp(-r2 / (uRadius * uRadius));
+    float wide = exp(-r2 / (uWide * uWide));
+    vec3 result = uMode > 0.5 ? mix(base, uValue, falloff * uStrength) : base + vec3(uValue.xy * falloff, uValue.z * wide);
+    outColor = vec4(result, 1.0);
+  }`;
 
-const ADVECT = `${HEADER}
-uniform sampler2D uVelocity;
-uniform sampler2D uSource;
-uniform vec2 uVelocityTexel;
-uniform float uDt;
-uniform vec4 uDecay;
-void main() {
-  vec2 coord = vUv - uDt * texture(uVelocity, vUv).xy * uVelocityTexel;
-  outColor = texture(uSource, coord) * uDecay;
-}`;
+  const ADVECT = `${HEADER}
+  uniform sampler2D uVelocity;
+  uniform sampler2D uSource;
+  uniform vec2 uVelocityTexel;
+  uniform float uDt;
+  uniform vec4 uDecay;
+  void main() {
+    vec2 coord = vUv - uDt * texture(uVelocity, vUv).xy * uVelocityTexel;
+    outColor = texture(uSource, coord) * uDecay;
+  }`;
 
-const MACCORMACK = `${HEADER}
-uniform sampler2D uVelocity;
-uniform sampler2D uSource;
-uniform sampler2D uForward;
-uniform sampler2D uBack;
-uniform vec2 uVelocityTexel;
-uniform vec2 uSourceTexel;
-uniform float uDt;
-uniform vec4 uDecay;
-void main() {
-  vec2 coord = vUv - uDt * texture(uVelocity, vUv).xy * uVelocityTexel;
-  vec4 forward = texture(uForward, vUv);
-  vec4 corrected = forward + 0.5 * (texture(uSource, vUv) - texture(uBack, vUv));
-  vec2 base = (floor(coord / uSourceTexel - 0.5) + 0.5) * uSourceTexel;
-  vec4 a = texture(uSource, base);
-  vec4 b = texture(uSource, base + vec2(uSourceTexel.x, 0.0));
-  vec4 c = texture(uSource, base + vec2(0.0, uSourceTexel.y));
-  vec4 d = texture(uSource, base + uSourceTexel);
-  vec4 low = min(min(a, b), min(c, d));
-  vec4 high = max(max(a, b), max(c, d));
-  outColor = clamp(corrected, low, high) * uDecay;
-}`;
+  const MACCORMACK = `${HEADER}
+  uniform sampler2D uVelocity;
+  uniform sampler2D uSource;
+  uniform sampler2D uForward;
+  uniform sampler2D uBack;
+  uniform vec2 uVelocityTexel;
+  uniform vec2 uSourceTexel;
+  uniform float uDt;
+  uniform vec4 uDecay;
+  void main() {
+    vec2 coord = vUv - uDt * texture(uVelocity, vUv).xy * uVelocityTexel;
+    vec4 forward = texture(uForward, vUv);
+    vec4 corrected = forward + 0.5 * (texture(uSource, vUv) - texture(uBack, vUv));
+    vec2 base = (floor(coord / uSourceTexel - 0.5) + 0.5) * uSourceTexel;
+    vec4 a = texture(uSource, base);
+    vec4 b = texture(uSource, base + vec2(uSourceTexel.x, 0.0));
+    vec4 c = texture(uSource, base + vec2(0.0, uSourceTexel.y));
+    vec4 d = texture(uSource, base + uSourceTexel);
+    vec4 low = min(min(a, b), min(c, d));
+    vec4 high = max(max(a, b), max(c, d));
+    outColor = clamp(corrected, low, high) * uDecay;
+  }`;
 
-const DIVERGENCE = `${HEADER}
-uniform sampler2D uVelocity;
-void main() {
-  float left = texture(uVelocity, vL).x;
-  float right = texture(uVelocity, vR).x;
-  float top = texture(uVelocity, vT).y;
-  float bottom = texture(uVelocity, vB).y;
-  vec2 center = texture(uVelocity, vUv).xy;
-  if (vL.x < 0.0) left = -center.x;
-  if (vR.x > 1.0) right = -center.x;
-  if (vT.y > 1.0) top = -center.y;
-  if (vB.y < 0.0) bottom = -center.y;
-  outColor = vec4(0.5 * (right - left + top - bottom), 0.0, 0.0, 1.0);
-}`;
+  const DIVERGENCE = `${HEADER}
+  uniform sampler2D uVelocity;
+  void main() {
+    float left = texture(uVelocity, vL).x;
+    float right = texture(uVelocity, vR).x;
+    float top = texture(uVelocity, vT).y;
+    float bottom = texture(uVelocity, vB).y;
+    vec2 center = texture(uVelocity, vUv).xy;
+    if (vL.x < 0.0) left = -center.x;
+    if (vR.x > 1.0) right = -center.x;
+    if (vT.y > 1.0) top = -center.y;
+    if (vB.y < 0.0) bottom = -center.y;
+    outColor = vec4(0.5 * (right - left + top - bottom), 0.0, 0.0, 1.0);
+  }`;
 
-const SCALE = `${HEADER}
-uniform sampler2D uSource;
-uniform float uValue;
-void main() {
-  outColor = texture(uSource, vUv) * uValue;
-}`;
+  const SCALE = `${HEADER}
+  uniform sampler2D uSource;
+  uniform float uValue;
+  void main() {
+    outColor = texture(uSource, vUv) * uValue;
+  }`;
 
-const PRESSURE = `${HEADER}
-uniform sampler2D uPressure;
-uniform sampler2D uDivergence;
-void main() {
-  float left = texture(uPressure, vL).x;
-  float right = texture(uPressure, vR).x;
-  float top = texture(uPressure, vT).x;
-  float bottom = texture(uPressure, vB).x;
-  float divergence = texture(uDivergence, vUv).x;
-  outColor = vec4((left + right + bottom + top - divergence) * 0.25, 0.0, 0.0, 1.0);
-}`;
+  const PRESSURE = `${HEADER}
+  uniform sampler2D uPressure;
+  uniform sampler2D uDivergence;
+  void main() {
+    float left = texture(uPressure, vL).x;
+    float right = texture(uPressure, vR).x;
+    float top = texture(uPressure, vT).x;
+    float bottom = texture(uPressure, vB).x;
+    float divergence = texture(uDivergence, vUv).x;
+    outColor = vec4((left + right + bottom + top - divergence) * 0.25, 0.0, 0.0, 1.0);
+  }`;
 
-const GRADIENT = `${HEADER}
-uniform sampler2D uPressure;
-uniform sampler2D uVelocity;
-void main() {
-  float left = texture(uPressure, vL).x;
-  float right = texture(uPressure, vR).x;
-  float top = texture(uPressure, vT).x;
-  float bottom = texture(uPressure, vB).x;
-  vec2 velocity = texture(uVelocity, vUv).xy - vec2(right - left, top - bottom);
-  outColor = vec4(velocity, 0.0, 1.0);
-}`;
+  const GRADIENT = `${HEADER}
+  uniform sampler2D uPressure;
+  uniform sampler2D uVelocity;
+  void main() {
+    float left = texture(uPressure, vL).x;
+    float right = texture(uPressure, vR).x;
+    float top = texture(uPressure, vT).x;
+    float bottom = texture(uPressure, vB).x;
+    vec2 velocity = texture(uVelocity, vUv).xy - vec2(right - left, top - bottom);
+    outColor = vec4(velocity, 0.0, 1.0);
+  }`;
 
-const SHADE = `
-uniform vec3 uColor;
-uniform vec3 uSecondary;
-uniform float uIntensity;
-uniform float uHotspot;
-vec3 shade(vec3 dye) {
-  float energy = max(dye.x, 0.0);
-  float heat = clamp(dye.y, 0.0, energy);
-  float gas = max(dye.z, 0.0);
-  float fresh = heat / max(energy, 0.0001);
-  vec3 tint = mix(uSecondary, uColor, fresh);
-  return (tint * energy + uSecondary * gas + vec3(heat * heat * 0.3 * uHotspot)) * uIntensity;
-}
-`;
-
-const PREFILTER = `${HEADER}${SHADE}
-uniform sampler2D uDye;
-uniform vec2 uDyeTexel;
-void main() {
-  vec2 o = uDyeTexel * 0.5;
-  vec3 light = shade(texture(uDye, vUv + vec2(-o.x, -o.y)).xyz);
-  light += shade(texture(uDye, vUv + vec2(o.x, -o.y)).xyz);
-  light += shade(texture(uDye, vUv + vec2(-o.x, o.y)).xyz);
-  light += shade(texture(uDye, vUv + vec2(o.x, o.y)).xyz);
-  outColor = vec4(light * 0.25, 1.0);
-}`;
-
-const DOWN = `${HEADER}
-uniform sampler2D uSource;
-uniform vec2 uSourceTexel;
-void main() {
-  vec2 o = uSourceTexel;
-  vec3 color = texture(uSource, vUv).rgb * 4.0;
-  color += texture(uSource, vUv + vec2(-o.x, -o.y)).rgb;
-  color += texture(uSource, vUv + vec2(o.x, -o.y)).rgb;
-  color += texture(uSource, vUv + vec2(-o.x, o.y)).rgb;
-  color += texture(uSource, vUv + vec2(o.x, o.y)).rgb;
-  outColor = vec4(color / 8.0, 1.0);
-}`;
-
-const UP = `${HEADER}
-uniform sampler2D uSource;
-uniform vec2 uSourceTexel;
-void main() {
-  vec2 o = uSourceTexel;
-  vec3 color = texture(uSource, vUv + vec2(-o.x * 2.0, 0.0)).rgb;
-  color += texture(uSource, vUv + vec2(o.x * 2.0, 0.0)).rgb;
-  color += texture(uSource, vUv + vec2(0.0, -o.y * 2.0)).rgb;
-  color += texture(uSource, vUv + vec2(0.0, o.y * 2.0)).rgb;
-  color += texture(uSource, vUv + vec2(-o.x, -o.y)).rgb * 2.0;
-  color += texture(uSource, vUv + vec2(o.x, -o.y)).rgb * 2.0;
-  color += texture(uSource, vUv + vec2(-o.x, o.y)).rgb * 2.0;
-  color += texture(uSource, vUv + vec2(o.x, o.y)).rgb * 2.0;
-  outColor = vec4(color / 12.0, 1.0);
-}`;
-
-const DISPLAY = `${HEADER}${SHADE}
-uniform sampler2D uDye;
-uniform sampler2D uBloom;
-uniform float uGlow;
-uniform float uGrain;
-uniform float uTime;
-uniform float uLight;
-float hash(vec2 p) {
-  p = fract(p * vec2(123.34, 456.21));
-  p += dot(p, p + 45.32);
-  return fract(p.x * p.y);
-}
-void main() {
-  vec3 dye = texture(uDye, vUv).xyz;
-  vec3 light = shade(dye);
-  vec3 bloom = texture(uBloom, vUv).rgb * uGlow;
-  float edge = smoothstep(0.0, 0.02, min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y)));
-  float grain = 1.0 + (hash(gl_FragCoord.xy + fract(uTime * 13.7) * 97.0) - 0.5) * uGrain * 2.0;
-  if (uLight > 0.5) {
+  const SHADE = `
+  uniform vec3 uColor;
+  uniform vec3 uSecondary;
+  uniform float uIntensity;
+  uniform float uHotspot;
+  vec3 shade(vec3 dye) {
     float energy = max(dye.x, 0.0);
     float heat = clamp(dye.y, 0.0, energy);
     float gas = max(dye.z, 0.0);
     float fresh = heat / max(energy, 0.0001);
     vec3 tint = mix(uSecondary, uColor, fresh);
-    float halo = dot(bloom, vec3(0.2126, 0.7152, 0.0722));
-    float density = 1.0 - exp(-((energy * 1.1 + gas * 0.8) * uIntensity + halo * 0.25));
-    float tone = dot(tint, vec3(0.2126, 0.7152, 0.0722));
-    vec3 ink = tint * min(1.0, 0.5 / max(tone, 0.001)) * mix(0.95, 0.72, smoothstep(0.5, 3.0, energy));
-    ink = mix(ink, vec3(1.0), clamp(heat * heat * 0.05 * uHotspot, 0.0, 0.45));
-    density = clamp(density * grain, 0.0, 1.0) * edge;
-    outColor = vec4(ink * density, density);
-  } else {
-    vec3 color = 1.0 - exp(-(light + bloom) * grain);
-    color *= edge;
-    outColor = vec4(color, max(color.r, max(color.g, color.b)));
+    return (tint * energy + uSecondary * gas + vec3(heat * heat * 0.3 * uHotspot)) * uIntensity;
   }
-}`;
+  `;
 
-const QUALITY = {
-  low: { sim: 96, dye: 384 },
-  medium: { sim: 128, dye: 576 },
-  high: { sim: 160, dye: 768 }
-};
+  const PREFILTER = `${HEADER}${SHADE}
+  uniform sampler2D uDye;
+  uniform vec2 uDyeTexel;
+  void main() {
+    vec2 o = uDyeTexel * 0.5;
+    vec3 light = shade(texture(uDye, vUv + vec2(-o.x, -o.y)).xyz);
+    light += shade(texture(uDye, vUv + vec2(o.x, -o.y)).xyz);
+    light += shade(texture(uDye, vUv + vec2(-o.x, o.y)).xyz);
+    light += shade(texture(uDye, vUv + vec2(o.x, o.y)).xyz);
+    outColor = vec4(light * 0.25, 1.0);
+  }`;
 
-const PRESSURE_STEPS = 20;
-const FLOW = 0.75;
-const BLOOM_LEVELS = 5;
+  const DOWN = `${HEADER}
+  uniform sampler2D uSource;
+  uniform vec2 uSourceTexel;
+  void main() {
+    vec2 o = uSourceTexel;
+    vec3 color = texture(uSource, vUv).rgb * 4.0;
+    color += texture(uSource, vUv + vec2(-o.x, -o.y)).rgb;
+    color += texture(uSource, vUv + vec2(o.x, -o.y)).rgb;
+    color += texture(uSource, vUv + vec2(-o.x, o.y)).rgb;
+    color += texture(uSource, vUv + vec2(o.x, o.y)).rgb;
+    outColor = vec4(color / 8.0, 1.0);
+  }`;
 
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const UP = `${HEADER}
+  uniform sampler2D uSource;
+  uniform vec2 uSourceTexel;
+  void main() {
+    vec2 o = uSourceTexel;
+    vec3 color = texture(uSource, vUv + vec2(-o.x * 2.0, 0.0)).rgb;
+    color += texture(uSource, vUv + vec2(o.x * 2.0, 0.0)).rgb;
+    color += texture(uSource, vUv + vec2(0.0, -o.y * 2.0)).rgb;
+    color += texture(uSource, vUv + vec2(0.0, o.y * 2.0)).rgb;
+    color += texture(uSource, vUv + vec2(-o.x, -o.y)).rgb * 2.0;
+    color += texture(uSource, vUv + vec2(o.x, -o.y)).rgb * 2.0;
+    color += texture(uSource, vUv + vec2(-o.x, o.y)).rgb * 2.0;
+    color += texture(uSource, vUv + vec2(o.x, o.y)).rgb * 2.0;
+    outColor = vec4(color / 12.0, 1.0);
+  }`;
 
-const compile = (gl, type, source) => {
-  const shader = gl.createShader(type);
-  if (!shader) return null;
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader;
-  gl.deleteShader(shader);
-  return null;
-};
-
-const toHsv = ([r, g, b]) => {
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const delta = max - min;
-  let hue = 0;
-  if (delta > 0) {
-    if (max === r) hue = ((g - b) / delta) % 6;
-    else if (max === g) hue = (b - r) / delta + 2;
-    else hue = (r - g) / delta + 4;
+  const DISPLAY = `${HEADER}${SHADE}
+  uniform sampler2D uDye;
+  uniform sampler2D uBloom;
+  uniform float uGlow;
+  uniform float uGrain;
+  uniform float uTime;
+  uniform float uLight;
+  float hash(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
   }
-  return [(hue * 60 + 360) % 360, max > 0 ? delta / max : 0, max];
-};
+  void main() {
+    vec3 dye = texture(uDye, vUv).xyz;
+    vec3 light = shade(dye);
+    vec3 bloom = texture(uBloom, vUv).rgb * uGlow;
+    float edge = smoothstep(0.0, 0.02, min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y)));
+    float grain = 1.0 + (hash(gl_FragCoord.xy + fract(uTime * 13.7) * 97.0) - 0.5) * uGrain * 2.0;
+    if (uLight > 0.5) {
+      float energy = max(dye.x, 0.0);
+      float heat = clamp(dye.y, 0.0, energy);
+      float gas = max(dye.z, 0.0);
+      float fresh = heat / max(energy, 0.0001);
+      vec3 tint = mix(uSecondary, uColor, fresh);
+      float halo = dot(bloom, vec3(0.2126, 0.7152, 0.0722));
+      float density = 1.0 - exp(-((energy * 1.1 + gas * 0.8) * uIntensity + halo * 0.25));
+      float tone = dot(tint, vec3(0.2126, 0.7152, 0.0722));
+      vec3 ink = tint * min(1.0, 0.5 / max(tone, 0.001)) * mix(0.95, 0.72, smoothstep(0.5, 3.0, energy));
+      ink = mix(ink, vec3(1.0), clamp(heat * heat * 0.05 * uHotspot, 0.0, 0.45));
+      density = clamp(density * grain, 0.0, 1.0) * edge;
+      outColor = vec4(ink * density, density);
+    } else {
+      vec3 color = 1.0 - exp(-(light + bloom) * grain);
+      color *= edge;
+      outColor = vec4(color, max(color.r, max(color.g, color.b)));
+    }
+  }`;
 
-const fromHsv = (hue, saturation, value) => {
-  const h = (((hue % 360) + 360) % 360) / 60;
-  const c = value * saturation;
-  const x = c * (1 - Math.abs((h % 2) - 1));
-  const m = value - c;
-  const [r, g, b] =
-    h < 1 ? [c, x, 0] : h < 2 ? [x, c, 0] : h < 3 ? [0, c, x] : h < 4 ? [0, x, c] : h < 5 ? [x, 0, c] : [c, 0, x];
-  return [r + m, g + m, b + m];
-};
-
-const GlowCursor = ({
-  color = '#5f8bff',
-  secondaryColor,
-  intensity = 1.3,
-  trailWidth = 3,
-  linger = 1.4,
-  glow = 1.2,
-  hotspot = 0.8,
-  followSpeed = 0.6,
-  grain = 0,
-  clickBurst = true,
-  quality = 'high',
-  theme = 'dark',
-  blendMode,
-  maxDevicePixelRatio = 2,
-  enabled = true,
-  children,
-  className = '',
-  style,
-  ...rest
-}) => {
-  const containerRef = useRef(null);
-  const canvasRef = useRef(null);
-  const settingsRef = useRef(null);
-  settingsRef.current = {
-    color: String(color),
-    secondaryColor: secondaryColor ? String(secondaryColor) : '',
-    intensity: Math.max(0, intensity),
-    trailWidth: clamp(trailWidth, 0.5, 40),
-    linger: clamp(linger, 0.1, 10),
-    glow: Math.max(0, glow),
-    hotspot: Math.max(0, hotspot),
-    followSpeed: clamp(followSpeed, 0, 1),
-    grain: Math.max(0, grain),
-    clickBurst,
-    quality: QUALITY[quality] ? quality : 'high',
-    theme,
-    maxDevicePixelRatio,
-    enabled
+  const QUALITY = {
+    low: { sim: 96, dye: 384 },
+    medium: { sim: 128, dye: 576 },
+    high: { sim: 160, dye: 768 }
   };
 
-  useEffect(() => {
-    const container = containerRef.current;
-    const canvas = canvasRef.current;
+  const PRESSURE_STEPS = 20;
+  const FLOW = 0.75;
+  const BLOOM_LEVELS = 5;
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const compile = (gl, type, source) => {
+    const shader = gl.createShader(type);
+    if (!shader) return null;
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader;
+    gl.deleteShader(shader);
+    return null;
+  };
+
+  const toHsv = ([r, g, b]) => {
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+    let hue = 0;
+    if (delta > 0) {
+      if (max === r) hue = ((g - b) / delta) % 6;
+      else if (max === g) hue = (b - r) / delta + 2;
+      else hue = (r - g) / delta + 4;
+    }
+    return [(hue * 60 + 360) % 360, max > 0 ? delta / max : 0, max];
+  };
+
+  const fromHsv = (hue, saturation, value) => {
+    const h = (((hue % 360) + 360) % 360) / 60;
+    const c = value * saturation;
+    const x = c * (1 - Math.abs((h % 2) - 1));
+    const m = value - c;
+    const [r, g, b] =
+      h < 1 ? [c, x, 0] : h < 2 ? [x, c, 0] : h < 3 ? [0, c, x] : h < 4 ? [0, x, c] : h < 5 ? [x, 0, c] : [c, 0, x];
+    return [r + m, g + m, b + m];
+  };
+
+  function GlowCursor(host, {
+    color = '#5f8bff',
+    secondaryColor,
+    intensity = 1.3,
+    trailWidth = 3,
+    linger = 1.4,
+    glow = 1.2,
+    hotspot = 0.8,
+    followSpeed = 0.6,
+    grain = 0,
+    clickBurst = true,
+    quality = 'high',
+    theme = 'dark',
+    blendMode,
+    maxDevicePixelRatio = 2,
+    enabled = true
+  }) {
+    const container = document.createElement('div');
+    container.className = 'glow-cursor';
+    const canvas = document.createElement('canvas');
+    canvas.className = 'glow-cursor__canvas';
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.style.mixBlendMode = blendMode ?? (theme === 'light' ? 'normal' : 'screen');
+    container.append(canvas);
+    host.replaceChildren(container);
+    const settings = {
+      color: String(color),
+      secondaryColor: secondaryColor ? String(secondaryColor) : '',
+      intensity: Math.max(0, intensity),
+      trailWidth: clamp(trailWidth, 0.5, 40),
+      linger: clamp(linger, 0.1, 10),
+      glow: Math.max(0, glow),
+      hotspot: Math.max(0, hotspot),
+      followSpeed: clamp(followSpeed, 0, 1),
+      grain: Math.max(0, grain),
+      clickBurst,
+      quality: QUALITY[quality] ? quality : 'high',
+      theme,
+      maxDevicePixelRatio,
+      enabled
+    };
     const gl = canvas?.getContext('webgl2', {
       alpha: true,
       premultipliedAlpha: true,
@@ -518,7 +511,7 @@ const GlowCursor = ({
     };
 
     const allocate = () => {
-      const s = settingsRef.current;
+      const s = settings;
       const key = `${s.quality}|${state.width}|${state.height}|${canvas.width}|${canvas.height}`;
       if (key === state.allocated && state.targets) return;
       release();
@@ -552,7 +545,7 @@ const GlowCursor = ({
 
     let resizePending = false;
     const applyResize = () => {
-      const s = settingsRef.current;
+      const s = settings;
       const width = Math.max(1, container.clientWidth);
       const height = Math.max(1, container.clientHeight);
       const ratio = Math.min(window.devicePixelRatio || 1, Math.max(0.5, s.maxDevicePixelRatio || 2));
@@ -819,7 +812,7 @@ const GlowCursor = ({
         applyResize();
       }
       if (!alive || !visible || document.hidden) return;
-      const s = settingsRef.current;
+      const s = settings;
       const dt = last ? Math.min(1 / 30, (now - last) / 1000) : 1 / 60;
       last = now;
       state.time += dt;
@@ -882,7 +875,7 @@ const GlowCursor = ({
     };
 
     const onPointerDown = event => {
-      const s = settingsRef.current;
+      const s = settings;
       if (!s.clickBurst || !s.enabled) return;
       const rect = container.getBoundingClientRect();
       const x = event.clientX - rect.left;
@@ -938,16 +931,89 @@ const GlowCursor = ({
       gl.deleteBuffer(buffer);
       gl.deleteVertexArray(vao);
     };
-  }, []);
+  }
 
-  const mode = blendMode ?? (theme === 'light' ? 'normal' : 'screen');
+  function montarCursor() {
+    const permitido = matchMedia('(any-hover: hover) and (any-pointer: fine) and (prefers-reduced-motion: no-preference)');
 
-  return (
-    <div ref={containerRef} className={`glow-cursor${className ? ` ${className}` : ''}`} style={style} {...rest}>
-      <canvas ref={canvasRef} className="glow-cursor__canvas" style={{ mixBlendMode: mode }} aria-hidden="true" />
-      {children && <div className="glow-cursor__content">{children}</div>}
-    </div>
-  );
-};
+    const cursor = document.createElement('div');
+    cursor.className = 'crimson-cursor';
+    cursor.hidden = true;
+    cursor.setAttribute('aria-hidden', 'true');
+    cursor.innerHTML = '<div class="rastro-glow"></div><span class="ponteiro-crimson"><span class="seta-crimson"></span><span class="legenda-cursor"></span></span>';
+    document.body.append(cursor);
+    const [rastro, ponteiro] = cursor.children;
+    const [seta, legenda] = ponteiro.children;
+    let desmontarRastro;
+    let x, y;
+    let pulso;
 
-export default GlowCursor;
+    function ocultar() {
+      cursor.hidden = true;
+      document.documentElement.classList.remove('crimson-pointer');
+      pulso?.cancel();
+    }
+
+    function montarRastro() {
+      if (rastro.firstChild) return;
+      desmontarRastro = GlowCursor(rastro, {
+        color: '#ff0037', intensity: 0.3, trailWidth: 3, linger: 0.3,
+        followSpeed: 1, glow: 3, clickBurst: true, theme: 'dark'
+      });
+    }
+
+    function atualizar(alvo) {
+      if (!alvo || alvo.isContentEditable || alvo.closest('textarea, select, iframe, input:not([type=range]):not([type=button]):not([type=submit]):not([type=checkbox]):not([type=radio])')) {
+        ocultar();
+        return;
+      }
+      const link = alvo.closest('a[href]');
+      const projeto = link && ['#projetos', '#scrum', '#lin0'].includes(link.getAttribute('href'));
+      const externo = link?.target === '_blank' && link.closest('#projetos, #scrum, #lin0');
+      const texto = externo ? 'OPEN' : projeto || alvo.closest('.projeto, .lin0-capa') ? 'VIEW' : '';
+      if (legenda.textContent !== texto) legenda.textContent = texto;
+      cursor.classList.toggle('interativo', Boolean(texto || link || alvo.closest('button, summary, input, [role="button"]')));
+      if (cursor.hidden) {
+        cursor.hidden = false;
+        document.documentElement.classList.add('crimson-pointer');
+      }
+      ponteiro.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      montarRastro();
+    }
+
+    window.addEventListener('pointermove', evento => {
+      if (!permitido.matches || evento.pointerType !== 'mouse') return ocultar();
+      x = evento.clientX;
+      y = evento.clientY;
+      atualizar(evento.target);
+    }, { passive: true });
+    window.addEventListener('pointerdown', evento => {
+      if (evento.pointerType !== 'mouse') return ocultar();
+      if (cursor.hidden || evento.button !== 0) return;
+      pulso?.cancel();
+      pulso = seta.animate([
+        { transform: 'scale(1)' },
+        { transform: 'scale(.73)', offset: .22 },
+        { transform: 'scale(1)' }
+      ], { duration: 270, easing: 'cubic-bezier(.23, 1, .32, 1)' });
+    });
+    window.addEventListener('scroll', () => {
+      if (!cursor.hidden) atualizar(document.elementFromPoint(x, y));
+    }, { passive: true, capture: true });
+    document.documentElement.addEventListener('pointerleave', ocultar);
+    window.addEventListener('pointercancel', ocultar);
+    window.addEventListener('blur', ocultar);
+    window.addEventListener('hashchange', ocultar);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) ocultar(); });
+    permitido.addEventListener('change', () => {
+      ocultar();
+      if (!permitido.matches) {
+        desmontarRastro?.();
+        rastro.replaceChildren();
+        desmontarRastro = undefined;
+      }
+    });
+  }
+
+  montarCursor();
+})();

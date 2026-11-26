@@ -1,12 +1,18 @@
 import { createRoot } from 'react-dom/client';
 import TechText from './TechText';
+import { montarCursor } from '../glow-cursor';
 
 const curriculo = document.getElementById('curriculo');
 const container = document.getElementById('tech-text-curriculo');
 
-function montarNome() {
+async function montarNome() {
   if (curriculo.hidden) return;
   window.removeEventListener('hashchange', montarNome);
+  try {
+    await document.fonts.load('600 64px "Akira Expanded Demo"', 'Alef Gabriel');
+  } catch {
+    // O componente também pode desenhar com a fonte alternativa.
+  }
 
   createRoot(container).render(
     <TechText
@@ -32,3 +38,4 @@ function montarNome() {
 
 window.addEventListener('hashchange', montarNome);
 montarNome();
+montarCursor();

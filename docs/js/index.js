@@ -4,6 +4,21 @@ const curriculo = document.getElementById('curriculo');
 const neon = curriculo.querySelector('.crimson-neon');
 const retrato = curriculo.querySelector('.retrato');
 const movimentoReduzido = window.matchMedia('(prefers-reduced-motion: reduce)');
+const permiteGiro = window.matchMedia('(any-hover: hover) and (any-pointer: fine) and (prefers-reduced-motion: no-preference)');
+
+retrato.addEventListener('pointermove', evento => {
+  if (evento.pointerType !== 'mouse' || !permiteGiro.matches) return;
+  const area = retrato.getBoundingClientRect();
+  const x = (evento.clientX - area.left) / area.width - .5;
+  const y = (evento.clientY - area.top) / area.height - .5;
+  retrato.style.setProperty('--giro-x', `${-y * 12}deg`);
+  retrato.style.setProperty('--giro-y', `${x * 16}deg`);
+});
+retrato.addEventListener('pointerleave', () => {
+  retrato.style.removeProperty('--giro-x');
+  retrato.style.removeProperty('--giro-y');
+});
+
 let curriculoAberto = false;
 
 function abrirCurriculo() {
@@ -78,7 +93,6 @@ if (location.protocol === 'file:' || ['localhost', '127.0.0.1', '[::1]'].include
   const teste = document.querySelector('.crimson-teste');
   const nivel = teste.querySelector('input');
   const percentual = teste.querySelector('output');
-  const arte = neon.parentElement;
   const sombraNormal = 2 / 15;
 
   function ajustarClaridade() {
@@ -88,8 +102,8 @@ if (location.protocol === 'file:' || ['localhost', '127.0.0.1', '[::1]'].include
       : sombraNormal * Math.max(0, (75 - valor) / 20);
     const brilho = Math.max(0, (valor - 75) / 25);
 
-    arte.style.setProperty('--crimson-sombra', sombra);
-    arte.style.setProperty('--crimson-luz', brilho);
+    document.body.style.setProperty('--crimson-sombra', sombra);
+    document.body.style.setProperty('--crimson-luz', brilho);
     percentual.value = `${valor}%`;
   }
 

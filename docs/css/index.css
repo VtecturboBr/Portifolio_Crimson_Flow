@@ -17,6 +17,8 @@
   --fonte-mono: "Cascadia Code", Consolas, monospace;
 }
 * { box-sizing: border-box; }
+html { scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
 body { margin: 0; background: var(--fundo); color: var(--texto); font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; line-height: 1.65; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; }
@@ -32,12 +34,7 @@ p { color: var(--secundario); }
 .site { max-width: 1160px; margin: auto; padding: 0 32px; }
 .pular-conteudo { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .pular-conteudo:focus { position: fixed; top: 12px; left: 12px; z-index: 10; width: auto; height: auto; padding: 12px 20px; clip-path: none; background: var(--texto); color: var(--fundo); }
-.barra-superior { display: flex; align-items: center; gap: 24px; min-height: 106px; }
-.assinatura { display: grid; place-items: center; flex: 0 0 64px; width: 64px; height: 72px; font-size: 72px; font-weight: 800; letter-spacing: 0; line-height: 1; transform: translateY(-10px); color: #ffffff; }
-.assinatura:hover { color: var(--destaque); }
-.edicao, .sobretitulo, .rotulo, .contato-tipo, .etiqueta, .demonstracao figcaption, .arte-legenda { font-family: var(--fonte-mono); font-size: 11px; letter-spacing: 1.3px; }
-.edicao { color: var(--secundario); }
-.edicao > span { color: #8d8d88; }
+.sobretitulo, .contato-tipo, .etiqueta, .demonstracao figcaption, .arte-legenda { font-family: var(--fonte-mono); font-size: 11px; letter-spacing: 1.3px; }
 .navegacao { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--linha); border-bottom: 0; }
 .navegacao a { display: flex; align-items: center; gap: 14px; padding: 20px 28px; border-bottom: 2px solid transparent; font-size: 14px; }
 .navegacao a + a { border-left: 1px solid var(--linha); }
@@ -56,28 +53,19 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
 .retrato { position: relative; padding: 9px; border: 1px solid #4a4a44; transform: rotate(3deg); background: #232322; }
 .retrato::before { content: ""; position: absolute; top: -1px; left: -1px; width: 44px; height: 3px; background: var(--destaque); }
 .retrato img { width: 100%; height: 273px; object-fit: cover; object-position: 22% 44%; filter: grayscale(1); }
-.faixa-disponibilidade { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding: 17px 56px; border-block: 1px solid var(--linha); background: #222221; font-size: 12px; }
-.faixa-disponibilidade > span { display: flex; align-items: center; gap: 10px; color: #d3d2ca; }
-.faixa-disponibilidade .ponto { background: #b7c69b; }
-.faixa-disponibilidade a { font-weight: 600; }
-.faixa-disponibilidade a span { margin-left: 15px; color: var(--destaque); }
-.curriculo-grid { display: grid; grid-template-columns: 265px minmax(0, 1fr); padding: 44px 56px 50px; }
-.lateral { padding-right: 36px; border-right: 1px solid var(--linha); }
-.rotulo { font-size: 11px; color: var(--texto); margin-bottom: 23px; }
+.curriculo-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; }
+.curriculo-adicional { grid-column: 1 / -1; }
 .contatos { list-style: none; padding: 0; margin: 0; }
 .contatos li + li { margin-top: 18px; }
 .contato-tipo { display: block; color: #aaa99f; font-size: 9px; letter-spacing: 1px; margin-bottom: 3px; }
 .contatos a { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; overflow-wrap: anywhere; }
 .contatos a > span { color: #aaa99f; }
-.conhecimentos { margin-top: 40px; }
 .conhecimentos h3 { color: var(--secundario); font-size: 12px; font-weight: 400; margin-bottom: 12px; }
 .tags { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; padding: 0; margin: 0; }
 .tags li { padding: 4px 9px; border: 1px solid #494945; border-radius: 3px; color: #d2d1ca; font-size: 11px; }
 .conhecimentos .tags + h3 { margin-top: 22px; }
-.principal { padding-left: 38px; }
 .bloco + .bloco { border-top: 1px solid var(--linha); margin-top: 26px; padding-top: 26px; }
 .bloco h2 { display: flex; align-items: center; gap: 13px; font-size: 19px; font-weight: 600; letter-spacing: -.4px; margin-bottom: 17px; }
-.numero { color: var(--destaque); font: 10px var(--fonte-mono); letter-spacing: 0; }
 .bloco p { font-size: 13px; line-height: 1.8; }
 .bloco p + p { margin-top: 10px; }
 .bloco h3 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
@@ -154,20 +142,12 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .hero, .cabecalho-pagina { padding: 40px 32px; }
   h1 { font-size: 52px; letter-spacing: -2.7px; }
   .retrato img { height: 235px; }
-  .faixa-disponibilidade { padding-inline: 32px; }
-  .curriculo-grid { grid-template-columns: 220px minmax(0, 1fr); padding: 36px 32px; }
-  .lateral { padding-right: 24px; }
-  .principal { padding-left: 26px; }
   .formacao { flex-wrap: wrap; }
   .projetos-conteudo, .lin0-conteudo { padding: 32px; }
   .projeto-intro { flex-direction: column; gap: 18px; }
 }
 @media (max-width: 640px) {
   .site { padding: 0 16px; }
-  .barra-superior { min-height: 82px; gap: 15px; }
-  .assinatura { flex-basis: 52px; width: 52px; height: 60px; font-size: 60px; }
-  .edicao { font-size: 8px; letter-spacing: .4px; max-width: 120px; }
-  .edicao > span { display: block; }
   .navegacao a { padding: 16px 12px; gap: 8px; font-size: 12px; }
   .navegacao a > span:first-child { font-size: 9px; }
   .seta-nav { display: none; }
@@ -177,15 +157,10 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .hero h1 { margin-top: 20px; }
   .retrato { width: 190px; justify-self: center; }
   .retrato img { height: 210px; }
-  .faixa-disponibilidade { padding: 16px 24px; font-size: 11px; }
-  .curriculo-grid { grid-template-columns: minmax(0, 1fr); padding: 30px 24px; }
-  .lateral { padding: 0 0 30px; border-right: 0; border-bottom: 1px solid var(--linha); }
   .contatos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 18px; }
   .contatos li + li { margin: 0; }
   .contatos a { font-size: 11px; }
   .contatos a > span { display: none; }
-  .conhecimentos { margin-top: 30px; }
-  .principal { padding: 30px 0 0; }
   .bloco h2 { font-size: 18px; }
   .cabecalho-pagina { padding: 34px 24px; }
   .cabecalho-pagina h1 { font-size: 42px; }
@@ -212,7 +187,7 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .lin0-mapa img { aspect-ratio: 4 / 3; }
 }
 @media screen {
-  #tech-text-curriculo:has(canvas) { width: 100%; height: 480px; position: relative; }
+  #tech-text-curriculo:has(canvas) { width: 100%; height: clamp(100px, 14vw, 156px); position: relative; }
   .hero-texto:has(#tech-text-curriculo canvas) #titulo-curriculo {
     position: absolute;
     width: 1px;
@@ -234,33 +209,45 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
 /* Quatro capas, quatro universos visuais. */
 @media screen {
   body { background: #100f0e; }
-  body[data-pagina="curriculo"] { --destaque: #ff0037; background: radial-gradient(ellipse at 15% 35%, #292929 0, transparent 45%), repeating-linear-gradient(125deg, #111111 0 2px, #151515 2px 3px); }
+  body[data-pagina="curriculo"] { --destaque: #ff0037; --margem-curriculo: max(42px, calc((100% - 1236px) / 2)); background: #100f0e; }
+  body[data-pagina="curriculo"] .site { max-width: none; padding: 0; }
+  body[data-pagina="curriculo"] .navegacao { padding-inline: var(--margem-curriculo); }
+  body[data-pagina="curriculo"] .navegacao { border-inline: 0; }
   body[data-pagina="projetos"] { background: radial-gradient(ellipse at 80% 20%, #381919, transparent 55%), #0a0d11; }
   body[data-pagina="scrum"] { background: radial-gradient(ellipse at 20% 15%, #392543, transparent 50%), radial-gradient(ellipse at 90% 60%, #293621, transparent 50%), #0b1010; --destaque: #e8c57a; }
   body[data-pagina="lin0"] { background: linear-gradient(#130609de, #0a090bed), url('../assets/images/lin0-background.png') center / cover fixed; }
   .site { max-width: 1320px; }
-  .barra-superior { min-height: 100px; }
   .navegacao { background: #0c0c0dd9; }
   .navegacao a { padding: 18px 22px; text-transform: uppercase; font: 12px var(--fonte-mono); letter-spacing: .5px; }
   .navegacao a[aria-current="page"] { background: #232323cc; }
   .pagina { position: relative; isolation: isolate; box-shadow: 0 25px 80px #0009; overflow: hidden; }
-  #curriculo { --linha: #4c4c4c; --secundario: #c9c9c9; background: linear-gradient(#0002, #0002), url('../assets/images/Fundo.png') center / cover #141414; }
-  #curriculo .hero { grid-template-columns: minmax(0, 1fr) 290px; gap: 26px; padding: 44px 42px 38px; }
+  #curriculo { display: flex; flex-direction: column; min-height: calc(100vw * 1391 / 1131); font-size: clamp(16px, 1.25vw, 19px); border: 0; box-shadow: none; --linha: #4c4c4c; --secundario: #c9c9c9; background: linear-gradient(#0002, #0002), url('../assets/images/Fundo.png') center top / cover #141414; }
+  #curriculo .hero { grid-template-columns: minmax(0, 1fr) clamp(220px, 21vw, 270px); gap: clamp(20px, 3vw, 44px); padding: 26px var(--margem-curriculo); }
   #curriculo h1 { margin: 0; }
   #curriculo .hero .sobretitulo { font-size: 9px; letter-spacing: 2px; color: #b5b5b5; }
   #curriculo .retrato { width: 100%; aspect-ratio: 1122 / 1402; padding: 0; border: 0; background: none; transform: none; }
   #curriculo .retrato::before { inset: 0; width: auto; height: auto; background: url('../assets/images/Borda.png') center / 100% 100% no-repeat; z-index: 1; pointer-events: none; }
   #curriculo .retrato img { position: absolute; inset: 13% 14% 21% 13%; width: 73%; height: 66%; object-position: 7% center; clip-path: polygon(8% 0, 100% 4%, 92% 100%, 0 95%); filter: saturate(.7) sepia(.12); }
-  #curriculo .faixa-disponibilidade { background: #26262677; border-block-style: dashed; }
-  #curriculo .curriculo-grid { padding: 38px 42px 40px; grid-template-columns: 270px minmax(0,1fr); }
-  #curriculo .rotulo { display: inline-block; padding: 7px 15px; background: #dddddd; color: #252525; font: 25px Impact, sans-serif; transform: rotate(-1deg); clip-path: polygon(0 4%,99% 0,100% 94%,1% 100%); }
-  #curriculo .bloco h2 { font: 27px Impact, 'Arial Narrow', sans-serif; text-transform: uppercase; letter-spacing: .5px; color: #dfdfdf; }
-  #curriculo .bloco h2::after { content: ''; flex: 1; height: 1px; background: #606060; }
-  #curriculo .numero { font-size: 16px; font-weight: 800; color: var(--destaque); }
-  #curriculo .bloco + .bloco { border: 0; padding-top: 8px; margin-top: 30px; }
-  #curriculo .contatos a { font-size: 13px; text-decoration: underline; text-decoration-color: var(--destaque); text-underline-offset: 4px; }
-  #curriculo .tags li { border: 0; border-left: 2px solid var(--destaque); background: #06060666; border-radius: 0; }
-  #curriculo .principal { position: relative; }
+  #curriculo .curriculo-grid {
+    flex: 1;
+    align-content: space-between;
+    column-gap: clamp(36px, 5vw, 80px);
+    row-gap: clamp(32px, 4vw, 64px);
+    padding: clamp(30px, 4vw, 64px) var(--margem-curriculo) clamp(44px, 6vw, 96px);
+  }
+  #curriculo .curriculo-grid > .bloco { min-width: 0; margin: 0; padding: 0; border: 0; }
+  #curriculo .bloco p { max-width: 62ch; font-size: clamp(16px, 1.4vw, 22px); line-height: 1.65; }
+  #curriculo .bloco h3 { font-size: clamp(16px, 1.45vw, 23px); line-height: 1.35; }
+  #curriculo .formacao { flex-wrap: wrap; justify-content: flex-start; gap: 16px; padding-left: 18px; }
+  #curriculo .link-texto { font-size: clamp(15px, 1.2vw, 19px); }
+  #curriculo .contatos { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  #curriculo .contatos li { margin: 0; }
+  #curriculo .contatos a { width: fit-content; }
+  #curriculo .contato-tipo { font-size: 12px; }
+  #curriculo .bloco h2 { display: block; margin-bottom: 20px; font: clamp(30px, 2.9vw, 46px)/1.1 Impact, 'Arial Narrow', sans-serif; text-transform: uppercase; letter-spacing: .5px; color: #dfdfdf; }
+  #curriculo .contatos a { font-size: clamp(16px, 1.35vw, 21px); text-decoration: underline; text-decoration-color: var(--destaque); text-underline-offset: 4px; }
+  #curriculo .tags li { font-size: clamp(14px, 1.15vw, 18px); border: 0; border-left: 2px solid var(--destaque); background: #06060666; border-radius: 0; }
+  #curriculo .competencias li { font-size: clamp(15px, 1.3vw, 20px); }
   .lp-kanji { position: absolute; z-index: -1; top: 49%; right: 22px; width: 260px; filter: invert(1); mix-blend-mode: screen; opacity: .08; transform: rotate(-10deg); }
   #projetos { --destaque: #ff554b; --linha: #414549; background: linear-gradient(115deg, #0c1014ed, #191a1ef5), repeating-linear-gradient(45deg, #777 0 1px,#111 1px 4px); }
   #projetos::before { content: ''; position: absolute; z-index: -1; right: 40px; top: 0; bottom: 0; width: 175px; border-inline: 2px solid #ffffff12; transform: skew(-15deg); background: linear-gradient(90deg,#a92121 0 10%,transparent 10% 18%,#8c211e 18% 21%,transparent 21%); opacity: .4; }
@@ -315,10 +302,9 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   #lin0 .lin0-mapa figcaption { background: #220e16; color: #deb4b8; }
 }
 @media screen and (max-width: 1000px) {
-  .barra-superior { flex-wrap: wrap; padding-block: 18px; gap: 14px; }
-  #curriculo .hero { grid-template-columns: minmax(0, 1fr) 220px; gap: 20px; padding: 40px 30px; }
-  #curriculo .curriculo-grid { grid-template-columns: 225px minmax(0,1fr); padding-inline: 30px; }
-  #curriculo .bloco h2 { font-size: 24px; }
+  body[data-pagina="curriculo"] { --margem-curriculo: 30px; }
+  #curriculo .hero { grid-template-columns: minmax(0, 1fr) 208px; gap: 20px; padding-block: 22px; }
+  #curriculo .bloco h2 { font-size: 27px; }
   .conta-giros { right: 40px; width: 225px; height: 225px; top: 90px; }
   .scrum-mascote { width: 270px; right: 0; top: 130px; }
   .scrum-cabecalho::before { width: 230px; right: 25px; }
@@ -326,21 +312,29 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   #scrum h1 { font-size: 57px; }
   #scrum h1 > span { font-size: 48px; }
 }
+@media screen and (min-width: 701px) {
+  #curriculo .hero {
+    grid-template-columns: minmax(0, 1fr) clamp(215px, 27vw, 440px);
+    align-items: center;
+    gap: clamp(20px, 3vw, 48px);
+    padding: clamp(62px, 8vw, 128px) clamp(28px, 3vw, 64px) clamp(148px, 16.5vw, 276px);
+  }
+  #curriculo .hero-texto { width: 100%; transform: translateY(clamp(12px, 1.25vw, 24px)); }
+  #tech-text-curriculo:has(canvas) { height: clamp(156px, 15vw, 300px); }
+}
+
 @media screen and (max-width: 700px) {
-  .barra-superior { gap: 16px; }
   .navegacao { grid-template-columns: repeat(2,1fr); }
   .navegacao a { font-size: 10px; padding: 15px 12px; }
   .navegacao a:nth-child(3) { border-left: 0; border-top: 1px solid #454545; }
   .navegacao a:nth-child(4) { border-top: 1px solid #454545; }
-  #curriculo .hero { grid-template-columns: minmax(0, 1fr); padding: 30px 22px; gap: 18px; }
+  body[data-pagina="curriculo"] { --margem-curriculo: 22px; }
+  #curriculo .hero { grid-template-columns: minmax(0, 1fr); padding-block: 14px 22px; gap: 4px; }
   #curriculo .hero .sobretitulo { font-size: 7px; letter-spacing: .5px; }
-  #curriculo .retrato { grid-column: 1 / -1; justify-self: center; width: min(250px, 100%); margin-top: 15px; }
-  #curriculo .curriculo-grid { grid-template-columns: minmax(0,1fr); padding: 28px 22px; }
-  #curriculo .lateral { border-right: 0; padding-right: 0; }
-  #curriculo .principal { padding: 28px 0 0; }
-  #curriculo .contatos a { font-size: 12px; }
-  #curriculo .bloco h2 { font-size: 23px; gap: 8px; }
-  #curriculo .bloco h2::after { min-width: 8px; }
+  #curriculo .retrato { grid-column: 1 / -1; justify-self: center; width: min(210px, 100%); }
+  #curriculo .curriculo-grid { grid-template-columns: minmax(0, 1fr); padding-top: 8px; }
+  #curriculo .contatos a { font-size: 14px; }
+  #curriculo .bloco h2 { font-size: 25px; gap: 8px; }
   .vtec-cabecalho, .scrum-cabecalho { padding: 32px 24px; }
   .vtec-cabecalho { min-height: 610px; }
   #projetos h1 { width: 100%; max-width: 400px; }
@@ -379,7 +373,7 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .jornada-niveis img { width: 50px; height: 60px; object-fit: contain; }
   .jornada-niveis span { font-size: 10px; }
   .cabecalho-pagina h1 > span { display: block; }
-  .barra-superior, .navegacao, .pular-conteudo, .video-projeto { display: none; }
+  .navegacao, .pular-conteudo, .video-projeto { display: none; }
   .pagina, .pagina[hidden] { display: block !important; border: 0; break-after: page; }
   .pagina:last-child { break-after: auto; }
   .hero { padding: 0 0 20px; grid-template-columns: 1fr 145px; }
@@ -387,18 +381,14 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .hero h1 > span, .cabecalho-pagina h1 > span { color: #555; }
   .retrato { transform: none; background: #fff; }
   .retrato img { height: 155px; }
-  .faixa-disponibilidade { padding: 12px 0; background: #fff; }
-  .curriculo-grid { padding: 24px 0 0; grid-template-columns: 190px 1fr; }
-  .principal { padding-left: 24px; }
-  .lateral { padding-right: 22px; }
+  .curriculo-grid { gap: 16px; padding-top: 18px; }
+  .curriculo-grid > section.bloco { margin: 0; padding: 0; border: 0; }
   .bloco + .bloco { margin-top: 12px; padding-top: 12px; }
   .bloco h2 { font-size: 14px; margin-bottom: 10px; }
   .bloco p { font-size: 10.5px; line-height: 1.6; }
   .hero h1 { margin-top: 12px; font-size: 32pt; }
-  .conhecimentos { margin-top: 24px; }
-  .rotulo { margin-bottom: 15px; }
   .contatos li + li { margin-top: 12px; }
-  .rotulo, .contatos a, .tags li, .competencias li, .etiqueta, .contato-tipo, .faixa-disponibilidade > span { color: #333; }
+  .contatos a, .tags li, .competencias li, .etiqueta, .contato-tipo { color: #333; }
   .cabecalho-pagina { padding: 0 0 22px; }
   .cabecalho-pagina h1 { font-size: 36pt; }
   .numero-fundo { display: none; }

@@ -21,7 +21,7 @@ retrato.addEventListener('pointerleave', () => {
 
 let curriculoAberto = false;
 
-for (const bloco of curriculo.querySelectorAll('.curriculo-grid > section:not(:last-child)')) {
+for (const bloco of curriculo.querySelectorAll('.curriculo-grid > :is(.contato-curriculo, .formacao-curriculo)')) {
   bloco.addEventListener('pointermove', evento => {
     if (evento.pointerType !== 'mouse' || !permiteGiro.matches) return;
     const area = bloco.getBoundingClientRect();
@@ -44,7 +44,7 @@ function abrirCurriculo() {
     .then(() => neon.classList.add('acesa'), () => {});
 
   const moldura = new Image();
-  moldura.src = 'assets/images/Borda.png';
+  moldura.src = 'assets/curriculo/Borda.png';
   Promise.allSettled([moldura.decode(), retrato.querySelector('img').decode()]).then(() => {
     if (!curriculo.hidden && !movimentoReduzido.matches) {
       retrato.classList.add('entrada-retrato');
@@ -153,10 +153,6 @@ function acompanharPassagem() {
   destacarNavegacao(nosProjetos ? '#area-projetos' : '#curriculo');
 }
 
-faixa.querySelector('img').addEventListener('click', () => {
-  yoruExibida = true;
-  passagem.scrollIntoView({ block: 'start', behavior: 'instant' });
-});
 window.addEventListener('scroll', () => {
   if (quadroPassagem) return;
   quadroPassagem = requestAnimationFrame(() => {
@@ -226,26 +222,3 @@ window.addEventListener('pagehide', () => {
     // A restauração nativa continua disponível.
   }
 });
-
-if (location.protocol === 'file:' || ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
-  const teste = document.querySelector('.crimson-teste');
-  const nivel = teste.querySelector('input');
-  const percentual = teste.querySelector('output');
-  const sombraNormal = 2 / 15;
-
-  function ajustarClaridade() {
-    const valor = nivel.valueAsNumber;
-    const sombra = valor <= 55
-      ? 1 - (1 - sombraNormal) * valor / 55
-      : sombraNormal * Math.max(0, (75 - valor) / 20);
-    const brilho = Math.max(0, (valor - 75) / 25);
-
-    document.body.style.setProperty('--crimson-sombra', sombra);
-    document.body.style.setProperty('--crimson-luz', brilho);
-    percentual.value = `${valor}%`;
-  }
-
-  nivel.addEventListener('input', ajustarClaridade);
-  ajustarClaridade();
-  teste.hidden = false;
-}

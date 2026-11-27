@@ -18,7 +18,7 @@
     height: 34px;
     margin: -2px 0 0 -2px;
     transform-origin: 2px 2px;
-    background: url('../assets/images/crimson-cursor.svg') center / contain no-repeat;
+    background: url('../assets/interface/crimson-cursor.svg') center / contain no-repeat;
     filter: drop-shadow(0 0 3px #ff0037);
     transition: transform 180ms cubic-bezier(.23, 1, .32, 1);
   }

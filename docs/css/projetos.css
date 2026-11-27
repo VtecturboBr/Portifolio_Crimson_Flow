@@ -13,8 +13,17 @@ button:active{transform:scale(.97)}
 .header{display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,330px);gap:28px;align-items:end;padding:65px 0 31px}
 .eyebrow,.tiny{font-family:monospace;letter-spacing:.14em;font-size:10px;text-transform:uppercase;color:#b4b4b4}
 .eyebrow{color:var(--red);margin:0 0 14px}
-.header h1{font-family:'Arial Black','Inter Display',Arial,sans-serif;font-size:clamp(48px,7.3vw,113px);line-height:.87;letter-spacing:-.045em;font-weight:950;text-transform:uppercase;margin:0}
-.header h1 em{font-style:normal;color:var(--red)}
+.header h1{font:600 clamp(27px,5.5vw,76px)/1.05 "Akira Expanded Demo",Arial,sans-serif;letter-spacing:0;text-align:center;text-transform:uppercase;margin:0}
+.header h1::after {
+  content: "";
+  display: block;
+  width: clamp(96px, 16vw, 240px);
+  height: 2px;
+  margin: 16px auto 0;
+  border-radius: 999px;
+  background: #ff0037;
+  box-shadow: 0 0 8px #ff0037, 0 0 18px #ff003788;
+}
 .intro{font-size:14px;line-height:1.65;color:#bababa;margin:0 0 5px;max-width:330px}
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:20px 0 23px;border-top:1px solid var(--line)}
 .filters{display:flex;flex-wrap:wrap;gap:6px}
@@ -38,10 +47,9 @@ button:active{transform:scale(.97)}
 .cover-top .feat{border-color:#ff174888;color:#ff4e6f}
 .cover-arrow{position:absolute;bottom:13px;right:13px;z-index:4;display:grid;place-items:center;width:35px;height:35px;border:1px solid #ffffff55;background:#0a0a0ac7;color:#fff;font-size:19px;transition:background 160ms ease,transform 200ms var(--ease),border-color 160ms ease}
 .project:hover .cover-arrow,.project:focus-within .cover-arrow{background:var(--red);border-color:var(--red);transform:translate(0,-2px);color:#090909}
-.meta { display: flex; align-items: baseline; gap: 8px; color: #cbc8c8; font: 600 .6875rem/1.45 var(--fonte-mono); letter-spacing: .045em; }
-.meta .red{color:var(--red)}
-.project h2{font-size:clamp(22px,2.4vw,32px);line-height:1.04;letter-spacing:-.05em;margin:0;font-weight:800;overflow-wrap:anywhere}
-.description{font-size:12.5px;line-height:1.6;color:#bbb;margin:0;min-height:40px}
+.meta { margin-block-start: 6px; margin-inline-start: 6px; color: #cbc8c8; font: 600 .6875rem/1.45 var(--fonte-mono); letter-spacing: .045em; }
+.project h2{font-size:clamp(22px,2.4vw,32px);line-height:1.04;letter-spacing:-.05em;margin:0;margin-inline-start:6px;margin-block-end:6px;font-weight:800;overflow-wrap:anywhere}
+.description{font-size:12.5px;line-height:1.6;color:#bbb;margin:0;margin-inline-start:6px;min-height:40px}
 .tags{display:flex;gap:5px 8px;flex-wrap:wrap;margin-top:auto;padding-top:5px}
 .tag{font:10px/1.4 monospace;color:#d0d0d0;border-left:2px solid #f32b4d88;padding:2px 0 2px 7px}
 .card-foot{margin-top:2px;border-top:1px solid #ffffff18;padding-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -80,7 +88,6 @@ to{opacity:1;transform:none}
 .top{height:54px}
 .top>span{font-size:8px}
 .header{grid-template-columns:1fr;gap:18px;padding:40px 0 25px}
-.header h1{font-size:clamp(43px,11vw,70px)}
 .intro{font-size:13px}
 .toolbar{padding:15px 0 17px;gap:10px}
 .filter{padding:9px 10px;font-size:10px}
@@ -100,7 +107,6 @@ to{opacity:1;transform:none}
 
 /* V2: generated covers and pointer-driven depth; no external dependencies. */
 .header{display:block;padding:46px 0 24px}
-.header h1{font-size:clamp(42px,6vw,87px);line-height:.94;letter-spacing:-.07em}
 .toolbar{justify-content:flex-start;padding:16px 0 24px}
 .grid{gap:24px 20px;overflow:visible}
 .project{display:flex;flex-direction:column;isolation:auto;overflow:visible;border:0;background:transparent;transform:none!important;perspective:1100px;transition:none;z-index:0}
@@ -132,7 +138,6 @@ to{opacity:1;transform:none}
 }
 
 @media(max-width:640px){.header{padding:28px 0 19px}
-.header h1{font-size:clamp(43px,11vw,65px)}
 .toolbar{padding:13px 0 17px}
 .grid{gap:16px}
 .cover-top span{font-size:9px}
@@ -152,7 +157,6 @@ to{opacity:1;transform:none}
 .shell{max-width:1340px;width:calc(100% - 100px)}
 
 .header{padding:20px 0 20px}
-.header h1{font-size:clamp(40px,5.5vw,76px)}
 
 .toolbar{padding:14px 0 29px}
 
@@ -193,7 +197,6 @@ to{opacity:1;transform:none}
 @media(max-width:540px){.grid{grid-template-columns:1fr;gap:80px;max-width:410px;margin:0 auto;padding:0 8px 36px}
 .shell{width:calc(100% - 32px)}
 .header{padding:28px 0 17px}
-.header h1{font-size:clamp(39px,12vw,61px)}
 .toolbar{padding:13px 0 26px}
 .project h2{font-size:27px}
 ..description{min-height:0}

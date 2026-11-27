@@ -31,8 +31,7 @@ img { display: block; max-width: 100%; }
 figure, h1, h2, h3, p { margin: 0; }
 p { color: var(--secundario); }
 [hidden] { display: none !important; }
-@property --luz-projetos { syntax: "<number>"; inherits: true; initial-value: 0; }
-.passagem-yoru { display: none; --luz-projetos: 0; }
+.passagem-yoru { display: none; }
 @media screen {
   body[data-pagina="curriculo"] .passagem-yoru {
     display: block;
@@ -43,19 +42,35 @@ p { color: var(--secundario); }
   .passagem-yoru::before {
     content: ''; position: absolute; inset: 0; pointer-events: none;
     background: url('../assets/images/Fundo2claro.webp') center / cover no-repeat;
-    opacity: var(--luz-projetos);
+    opacity: 0;
   }
   .passagem-yoru > .shell { position: relative; }
-  .passagem-yoru .grid { filter: brightness(calc(.3 + .7 * var(--luz-projetos))); }
-  .passagem-yoru[data-fase="fundo"] { animation: ligar-projetos 920ms ease-out 880ms both; }
-  @keyframes ligar-projetos {
-    0% { --luz-projetos: 0; }
-    23% { --luz-projetos: .78; }
-    48% { --luz-projetos: .14; }
-    100% { --luz-projetos: 1; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .passagem-yoru[data-fase="fundo"] { animation: none; --luz-projetos: 1; }
+  .passagem-yoru .project { filter: brightness(.34); }
+  .passagem-yoru[data-fase="fundo"]::before { opacity: 1; }
+  .passagem-yoru[data-fase="fundo"] .project { filter: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .passagem-yoru[data-fase="fundo"]:not([data-sem-intro])::before {
+      animation: acender-ambiente 1450ms ease-in-out 420ms backwards;
+    }
+    .passagem-yoru[data-fase="fundo"]:not([data-sem-intro]) .project {
+      animation: iluminar-card 1180ms ease-in-out var(--atraso-luz, 510ms) backwards;
+    }
+    .passagem-yoru .project:nth-child(2) { --atraso-luz: 585ms; }
+    .passagem-yoru .project:nth-child(3) { --atraso-luz: 660ms; }
+    @keyframes acender-ambiente {
+      0% { opacity: 0; }
+      17% { opacity: .32; }
+      29% { opacity: .10; }
+      62% { opacity: .86; }
+      100% { opacity: 1; }
+    }
+    @keyframes iluminar-card {
+      0% { filter: brightness(.34); }
+      17% { filter: brightness(.56); }
+      29% { filter: brightness(.44); }
+      75% { filter: brightness(.96); }
+      100% { filter: brightness(1); }
+    }
   }
   .breu-yoru {
     position: fixed; inset: 0; z-index: 1000;
@@ -66,6 +81,18 @@ p { color: var(--secundario); }
   .breu-yoru { transition: opacity 360ms ease-out, visibility 0s 360ms; }
   .passagem-yoru:is([data-fase="descida"], [data-fase="subida"]) .breu-yoru { visibility: visible; opacity: 1; transition: none; }
   .passagem-yoru[data-fase="descida"] img { animation: cena-yoru 3.8s both; }
+  .passagem-yoru[data-fase="descida"] .breu-yoru img {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .passagem-yoru[data-fase="breu"] .breu-yoru {
+    visibility: visible;
+    animation: breu-projetos 650ms ease-out both;
+  }
+  @keyframes breu-projetos {
+    0% { opacity: 0; }
+    45%, 100% { opacity: 1; }
+  }
   @keyframes cena-yoru {
     0%, 22% { opacity: 0; transform: scale(1.06); }
     42% { opacity: 1; }
@@ -265,11 +292,17 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
 @media screen {
   @media (scripting: enabled) {
     #tech-text-curriculo { width: 100%; height: clamp(100px, 14vw, 156px); position: relative; }
-    #titulo-curriculo { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
     #curriculo .retrato:not(.foto-pronta) { opacity: 0; }
   }
   #tech-text-curriculo:has(canvas) { width: 100%; height: clamp(100px, 14vw, 156px); position: relative; }
-  .hero-texto:has(#tech-text-curriculo canvas) #titulo-curriculo {
+  #tech-text-curriculo:not([data-nome-pronto]) { position: absolute; inset: 0; visibility: hidden; }
+  .hero-texto { position: relative; }
+  #titulo-curriculo {
+    color: #ff0037;
+    font: 600 clamp(24px, 5.5vw, 100px)/1.1 "Akira Expanded Demo", Arial, sans-serif;
+    text-transform: uppercase;
+  }
+  .hero-texto:has(#tech-text-curriculo[data-nome-pronto]) #titulo-curriculo {
     position: absolute;
     width: 1px;
     height: 1px;

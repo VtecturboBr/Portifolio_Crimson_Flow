@@ -84,6 +84,8 @@ function abrirCurriculo() {
 }
 const nomes = { curriculo: 'Currículo', projetos: 'V-Tec Motors', scrum: 'Scrum Dungeon', lin0: 'LIN0' };
 const passagem = document.querySelector('.passagem-yoru');
+let restaurandoRolagem = performance.getEntriesByType('navigation')[0]?.type === 'reload';
+let yoruExibida = false;
 let ultimaRolagem = window.scrollY;
 let retornoAoCurriculo;
 
@@ -109,19 +111,41 @@ function acompanharPassagem() {
   const topo = passagem.getBoundingClientRect().top;
   const fase = passagem.dataset.fase;
   if (!fase && topo <= window.innerHeight + 1) {
-    passagem.dataset.fase = 'descida';
-  } else if ((fase === 'descida' || fase === 'fundo') && ultimaRolagem < anterior && topo > 1) {
+    if (restaurandoRolagem || movimentoReduzido.matches) {
+      passagem.dataset.semIntro = '';
+      revelarProjetos(topo > 1);
+    } else if (yoruExibida) {
+      passagem.dataset.semIntro = '';
+      passagem.dataset.fase = 'breu';
+    } else {
+      yoruExibida = true;
+      delete passagem.dataset.semIntro;
+      passagem.dataset.fase = 'descida';
+    }
+  } else if (ultimaRolagem < anterior &&
+    (((fase === 'descida' || fase === 'breu') && topo > window.innerHeight + 1) || (fase === 'fundo' && topo > 1))) {
     voltarPeloBreu();
   }
 }
 
-passagem.addEventListener('animationend', evento => {
-  if (!evento.target.matches('.breu-yoru img') || passagem.dataset.fase !== 'descida') return;
-  // A troca de posi??o acontece enquanto o preto ainda cobre toda a tela.
-  passagem.scrollIntoView({ block: 'start', behavior: 'instant' });
+function revelarProjetos(alinharAoTopo) {
+  if (alinharAoTopo) passagem.scrollIntoView({ block: 'start', behavior: 'instant' });
   ultimaRolagem = window.scrollY;
   passagem.dataset.fase = 'fundo';
   destacarNavegacao('#area-projetos');
+}
+
+passagem.querySelector('.breu-yoru img').addEventListener('click', () => {
+  if (passagem.dataset.fase === 'descida') revelarProjetos(true);
+});
+
+passagem.addEventListener('animationend', evento => {
+  if (evento.animationName === 'breu-projetos' && passagem.dataset.fase === 'breu') {
+    revelarProjetos(true);
+    return;
+  }
+  if (!evento.target.matches('.breu-yoru img') || passagem.dataset.fase !== 'descida') return;
+  revelarProjetos(true);
 });
 window.addEventListener('scroll', acompanharPassagem, { passive: true });
 window.addEventListener('resize', acompanharPassagem);
@@ -155,6 +179,11 @@ function atualizarPagina(evento) {
 }
 window.addEventListener('hashchange', atualizarPagina);
 atualizarPagina();
+// O navegador pode restaurar a rolagem depois da inicialização dos scripts.
+window.addEventListener('pageshow', () => {
+  acompanharPassagem();
+  restaurandoRolagem = false;
+});
 
 if (location.protocol === 'file:' || ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
   const teste = document.querySelector('.crimson-teste');

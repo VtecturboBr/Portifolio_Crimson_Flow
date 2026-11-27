@@ -861,6 +861,10 @@
       });
       if (presence > 0.001) drawReveal(s);
       drawFrame(s, accent);
+      if (glyphs.length && progress > .08 && !host.hasAttribute('data-nome-pronto')) {
+        host.setAttribute('data-nome-pronto', '');
+        resize();
+      }
 
       const settling =
         moving ||
@@ -945,6 +949,7 @@
     container.addEventListener('pointercancel', onUp, { passive: true });
     container.addEventListener('pointerleave', onLeave, { passive: true });
     canvas.addEventListener('contextrestored', invalidateLayout);
+    canvas.addEventListener('contextlost', () => host.removeAttribute('data-nome-pronto'));
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);

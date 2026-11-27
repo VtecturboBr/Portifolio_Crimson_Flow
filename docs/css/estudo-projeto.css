@@ -1,0 +1,216 @@
+html.case-open,
+html.case-open body { overflow: hidden; }
+
+#projectDialog {
+  --case-nav: #ff0037;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: clamp(8px, 2.5vmin, 32px);
+  border: 0;
+  overflow: hidden;
+  background: transparent;
+  color: #f5f2ee;
+  font: 400 15px/1.55 "Segoe UI", Arial, sans-serif;
+}
+#projectDialog[open] { display: grid; place-items: center; }
+#projectDialog::backdrop {
+  background: rgb(0 0 0 / 78%);
+  backdrop-filter: blur(4px);
+  animation: case-dim 240ms ease-out both;
+}
+#projectDialog.is-closing::backdrop { opacity: 0; animation: none; transition: opacity 240ms ease-out; }
+@keyframes case-dim { from { opacity: 0; } to { opacity: 1; } }
+.case-panel {
+  --case-rule: #ffffff26;
+  width: min(1100px, 100%);
+  max-height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #101111;
+  border: 1px solid #ffffff32;
+  border-radius: 12px;
+  box-shadow: 0 24px 90px #000b;
+  transform-origin: top left;
+}
+.case-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: none;
+  min-height: 55px;
+  padding: 6px clamp(16px, 3.1vw, 39px);
+  border-bottom: 1px solid var(--case-rule);
+  background: #121414;
+  font: 600 11px/1.4 var(--fonte-mono);
+  letter-spacing: .055em;
+}
+.case-edition { color: #edeae6; }
+.case-category {
+  color: var(--case-accent);
+  border-left: 1px solid var(--case-rule);
+  padding-left: 16px;
+  text-transform: uppercase;
+}
+.case-close, .case-controls button, .case-player button {
+  border: 1px solid #ffffff36;
+  border-radius: 6px;
+  color: #f5f2ee;
+  background: transparent;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 120ms var(--ease);
+}
+.case-close { margin-left: auto; flex: none; width: 40px; height: 36px; font: 24px/1 Arial; }
+.case-scroll { min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #5b5757 transparent; }
+.case-lead {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: clamp(22px, 3.4vw, 46px);
+  align-items: center;
+  padding: clamp(24px, 4vw, 46px) clamp(20px, 3.7vw, 46px);
+  border-bottom: 1px solid var(--case-rule);
+  background: radial-gradient(ellipse at 15% 28%, var(--case-surface), transparent 72%),
+              linear-gradient(115deg, #131515, #101011 85%);
+}
+#dialog-title { margin: 0; outline: none; }
+#dialog-title img { width: auto; height: auto; max-width: 100%; max-height: 72px; object-fit: contain; object-position: left center; }
+.case-summary { margin: 18px 0 22px; max-width: 33ch; color: #dfdfda; font-size: clamp(16px, 1.45vw, 20px); line-height: 1.46; }
+.case-actions, .case-controls, .case-markers { display: flex; align-items: center; }
+.case-actions { flex-wrap: wrap; gap: 8px; }
+.case-actions a, .case-player button {
+  padding: 9px 13px;
+  border-radius: 5px;
+  border: 1px solid #ffffff33;
+  font: 600 13px/1.4 "Segoe UI", Arial, sans-serif;
+}
+.case-actions a:first-child { background: var(--case-accent); border-color: transparent; color: #101212; }
+.case-gallery { min-width: 0; margin: 0; }
+.case-stage {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #080a0b;
+  touch-action: pan-y pinch-zoom;
+}
+.case-stage > img, .case-stage > video, .case-stage > iframe {
+  width: 100%; height: 100%; min-height: 0; border: 0; object-fit: contain; display: block;
+}
+.case-stage:has(.case-watch) { grid-template-rows: minmax(0, 1fr) auto; }
+.case-watch { padding: 4px 8px; justify-self: end; color: var(--case-accent); font-size: 12px; }
+.case-stage > :first-child { animation: case-media-in 190ms var(--ease) both; }
+.case-stage .case-outgoing { position: absolute; inset: 0; background: #080a0b; pointer-events: none; }
+.case-gallery:not(.is-expanded) .case-stage > img { object-fit: cover; object-position: center top; }
+.case-stage[role="button"]::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: rgb(255 255 255 / 11%); box-shadow: inset 0 0 0 2px #ffffff85;
+}
+@media (hover: hover) {
+  .case-stage[role="button"]:hover::after { opacity: 1; }
+}
+.case-stage[role="button"]:focus-visible::after { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .case-stage[role="button"]::after { transition: opacity 150ms ease; }
+}
+.case-player {
+  position: relative; isolation: isolate; width: 100%; height: 100%;
+  display: flex; align-items: end; justify-content: center; flex-wrap: wrap; align-content: end;
+  gap: 8px; padding: clamp(10px, 2vw, 22px);
+  background: linear-gradient(transparent 35%, #000b);
+}
+.case-player img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.case-player::before { content: ""; position: absolute; inset: 0; background: inherit; z-index: -1; }
+.case-player a, .case-story a { color: var(--case-accent); font-weight: 600; font-size: 13px; text-underline-offset: 4px; }
+.case-player a, .case-player button, .case-stage .case-watch {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 13px; border-radius: 6px;
+  background: #161616; color: white; border: 1px solid #ffffff68; text-decoration: none;
+  font: 600 13px/1.4 "Segoe UI", sans-serif;
+}
+.case-player a::before, .case-watch::before { content: "▶"; color: white; background: #c90023; padding: 1px 6px; border-radius: 4px; font-size: 10px; }
+.case-player a:hover, .case-stage .case-watch:hover { background: #352027; color: white; border-color: #ff5478; }
+.case-gallery figcaption { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 10px; }
+.case-caption { color: #d4d3d0; font: 12px/1.4 var(--fonte-mono); }
+.case-controls { gap: 4px; flex: none; }
+.case-controls button { width: 32px; height: 32px; font-size: 17px; line-height: 1; }
+.case-controls [data-slide] { color: var(--case-nav); }
+.case-controls .case-markers { gap: 1px; margin-right: 4px; }
+.case-markers button { position: relative; width: 14px; border: 0; padding: 0; }
+.case-markers button::after {
+  content: ""; display: block; width: 100%; height: 3px; border-radius: 2px;
+  transform: scaleX(.55); background: #737071;
+  transition: transform 160ms var(--ease), background-color 160ms ease;
+}
+.case-markers button[aria-pressed="true"]::after { transform: scaleX(1); background: var(--case-nav); }
+.case-gallery.is-expanded {
+  position: fixed; inset: 0; z-index: 6; display: flex; flex-direction: column;
+  padding: clamp(12px, 3vw, 38px); background: #08090a;
+}
+.case-gallery.is-expanded .case-stage { flex: 1; min-height: 0; aspect-ratio: auto; }
+.case-gallery.is-expanded img { object-fit: contain; }
+.case-gallery.is-expanded figcaption { flex: none; }
+.case-scroll.zoom-active { overflow: hidden; }
+.case-flight { position: fixed; z-index: 4; object-fit: cover; max-width: none; pointer-events: none; transform-origin: 0 0; }
+.case-story {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(28px, 5vw, 66px);
+  padding: 0 clamp(20px, 3.7vw, 46px);
+}
+.case-story section { padding: 23px 0; border-bottom: 1px solid var(--case-rule); }
+.case-story h3 { margin: 0 0 9px; font-size: clamp(18px, 1.65vw, 23px); line-height: 1.2; letter-spacing: -.025em; }
+.case-story p, .case-story li { color: #c8c8c4; font-size: 15px; line-height: 1.58; }
+.case-story ul { margin: 0; padding-left: 1.12em; }
+.case-story li + li { margin-top: 4px; }
+.case-story li::marker { color: var(--case-accent); }
+.case-story a { display: inline-block; margin-top: 10px; }
+.case-stack ul { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 0; list-style: none; }
+.case-stack li, .case-stack li + li { margin: 0; color: var(--case-accent); font: 13px/1.6 var(--fonte-mono); }
+.case-stack li::before {
+  content: ""; display: inline-block; width: 4px; height: 4px; margin: 0 7px 2px 0;
+  border-radius: 50%; background: var(--case-light); box-shadow: 0 0 6px var(--case-light);
+}
+.case-browse { display: flex; justify-content: space-between; gap: 12px; padding: 24px clamp(20px, 3.7vw, 46px) 28px; }
+.case-browse button { padding: 4px 0; border: 0; background: none; text-align: left; }
+.case-browse button:last-child { text-align: right; }
+.case-browse small { display: block; color: #ff829b; font: 12px/1.6 var(--fonte-mono); }
+.case-browse strong { display: block; font-size: 17px; }
+@keyframes case-media-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes case-copy-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  #projectDialog[open] .case-intro > *, #projectDialog[open] .case-story section { animation: case-copy-in 230ms var(--ease) 80ms backwards; }
+  #projectDialog[open] .case-summary { animation-delay: 115ms; }
+  #projectDialog[open] .case-actions, #projectDialog[open] .case-story section:nth-child(even) { animation-delay: 150ms; }
+}
+@media (hover:hover) and (pointer:fine) {
+  .case-close:hover, .case-controls button:not([aria-pressed="true"]):hover, .case-player button:hover {
+    background: #ff003724; border-color: var(--case-nav);
+  }
+  .case-actions a:hover { box-shadow: inset 0 0 0 1px var(--case-accent); }
+  .case-story a:hover, .case-browse button:hover strong { text-decoration: underline; text-underline-offset: 4px; }
+}
+@media (max-width: 700px) {
+  .case-panel { border-radius: 9px; }
+  .case-bar { gap: 9px; font-size: 10px; }
+  .case-category { padding-left: 9px; }
+  .case-lead, .case-story { grid-template-columns: minmax(0,1fr); }
+  .case-lead { gap: 22px; }
+  #dialog-title img { max-height: 54px; max-width: min(100%, 350px); }
+  .case-summary { margin: 12px 0 16px; }
+  .case-story section { padding: 18px 0; }
+  .case-gallery figcaption { flex-wrap: wrap; }
+  .case-controls { margin-left: auto; }
+  .case-controls button { min-height: 36px; }
+  .case-caption { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #projectDialog::backdrop, .case-stage > :first-child { animation: none; transition: none; }
+}

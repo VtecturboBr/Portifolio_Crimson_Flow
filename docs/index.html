@@ -10,10 +10,14 @@
   <link rel="preload" href="assets/curriculo/Borda.png" as="image">
   <link rel="stylesheet" href="css/index.css">
   <link rel="stylesheet" href="css/projetos.css">
+  <link rel="stylesheet" href="css/estudo-projeto.css">
   <noscript><style>.crimson-arte .crimson-neon { opacity: 1; }</style></noscript>
   <link rel="stylesheet" href="css/tech-text.css">
   <link rel="stylesheet" href="css/crimson-cursor.css">
   <script src="js/index.js" defer></script>
+  <script src="js/projetos-dados.js" defer></script>
+  <script src="js/estudo-movimento.js" defer></script>
+  <script src="js/estudo-projeto.js" defer></script>
   <script src="js/projetos.js" defer></script>
   <script src="js/tech-text.js" defer></script>
   <script src="js/glow-cursor.js" defer></script>
@@ -98,7 +102,42 @@
         <div class="breu-yoru"><img src="assets/transicao/Yoru.png" alt="" decoding="async"></div>
       </div>
       <section class="passagem-yoru" id="area-projetos" aria-label="Projetos" tabindex="-1">
-<div class="shell"><section class="header"><div><h1>Projetos</h1></div></section><div class="toolbar"><div class="filters" aria-label="Filtrar projetos"><button type="button" class="filter" data-filter="all" aria-pressed="true">Todos</button><button type="button" class="filter" data-filter="academic" aria-pressed="false">Acadêmicos</button><button type="button" class="filter" data-filter="personal" aria-pressed="false">Pessoais</button></div><div id="count" class="sr-only" role="status" aria-live="polite"></div></div><div id="grid" class="grid"></div></div><dialog id="projectDialog" aria-labelledby="dialog-title"><button class="dialog-close" type="button" aria-label="Fechar detalhes">×</button><div class="dialog-cover"></div><div class="dialog-content"></div></dialog>
+<div class="shell"><section class="header"><div><h1>Projetos</h1></div></section><div class="toolbar"><div class="filters" aria-label="Filtrar projetos"><button type="button" class="filter" data-filter="all" aria-pressed="true">Todos</button><button type="button" class="filter" data-filter="academic" aria-pressed="false">Acadêmicos</button><button type="button" class="filter" data-filter="personal" aria-pressed="false">Pessoais</button></div><div id="count" class="sr-only" role="status" aria-live="polite"></div></div><div id="grid" class="grid"></div></div>
+        <dialog id="projectDialog" aria-labelledby="dialog-title">
+          <div class="case-panel">
+            <header class="case-bar">
+              <span class="case-edition">Estudo de projeto</span>
+              <span class="case-category"></span>
+              <button type="button" class="case-close" aria-label="Fechar estudo de projeto" autofocus>×</button>
+            </header>
+            <div class="case-scroll">
+              <div class="case-lead">
+                <div class="case-intro">
+                  <h2 id="dialog-title" tabindex="-1"><img alt=""></h2>
+                  <p class="case-summary"></p>
+                  <div class="case-actions"></div>
+                </div>
+                <figure class="case-gallery" aria-label="Galeria do projeto">
+                  <div class="case-stage"></div>
+                  <figcaption>
+                    <div class="case-caption" aria-live="polite" aria-atomic="true"></div>
+                    <div class="case-controls">
+                      <div class="case-markers" role="group" aria-label="Escolher mídia"></div>
+                      <button type="button" data-slide="-1" aria-label="Mídia anterior">←</button>
+                      <button type="button" data-slide="1" aria-label="Próxima mídia">→</button>
+                      <button type="button" class="case-expand" aria-label="Ampliar imagem" aria-pressed="false">⛶</button>
+                    </div>
+                  </figcaption>
+                </figure>
+              </div>
+              <div class="case-story"></div>
+              <nav class="case-browse" aria-label="Outros estudos de projeto">
+                <button type="button" data-project-step="-1"><small>← Anterior</small><strong></strong></button>
+                <button type="button" data-project-step="1"><small>Próximo →</small><strong></strong></button>
+              </nav>
+            </div>
+          </div>
+        </dialog>
       </section>
       <article class="pagina" id="projetos" aria-labelledby="titulo-projetos">
         <header class="cabecalho-pagina vtec-cabecalho"><p class="sobretitulo">02 / GARAGEM DIGITAL · PROJETO PESSOAL</p><h1 id="titulo-projetos" tabindex="-1"><img class="vtec-logo" src="assets/projetos/vtec/V-TEC-logo.png" alt="V-Tec Motors" width="600" height="440"></h1><p>Design em alta rotação.<br>Uma vitrine para os clássicos da Honda.</p><img class="conta-giros" src="assets/projetos/vtec/velocimetro-vtec.png" alt="Conta-giros V-TEC" width="500" height="500"><span class="numero-fundo" aria-hidden="true">02</span></header>

@@ -49,6 +49,15 @@ button:active{transform:scale(.97)}
 .project:hover .cover-arrow,.project:focus-within .cover-arrow{background:var(--red);border-color:var(--red);transform:translate(0,-2px);color:#090909}
 .meta { margin-block-start: 6px; margin-inline-start: 6px; color: #cbc8c8; font: 600 .6875rem/1.45 var(--fonte-mono); letter-spacing: .045em; }
 .project h2{font-size:clamp(22px,2.4vw,32px);line-height:1.04;letter-spacing:-.05em;margin:0;margin-inline-start:6px;margin-block-end:6px;font-weight:800;overflow-wrap:anywhere}
+.titulo-projeto {
+  display: block;
+  width: auto;
+  height: clamp(29px, 2.8vw, 40px);
+  max-width: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+.dialog-content .titulo-projeto { height: clamp(42px, 6vw, 68px); }
 .description{font-size:12.5px;line-height:1.6;color:#bbb;margin:0;margin-inline-start:6px;min-height:40px}
 .tags{display:flex;gap:5px 8px;flex-wrap:wrap;margin-top:auto;padding-top:5px}
 .tag{font:10px/1.4 monospace;color:#d0d0d0;border-left:2px solid #f32b4d88;padding:2px 0 2px 7px}
@@ -63,8 +72,8 @@ button:active{transform:scale(.97)}
 dialog{color:var(--text);padding:0;border:1px solid #666;background:#111;width:min(760px,calc(100% - 28px));max-height:calc(100dvh - 32px);overflow:auto;box-shadow:0 30px 100px #000a}
 dialog::backdrop{background:#000c;backdrop-filter:blur(3px)}
 dialog[open]{animation:modal-in 230ms var(--ease) both}
-@keyframes modal-in{from{opacity:0;transform:translateY(9px) scale(.98)}
-to{opacity:1;transform:none}
+@keyframes modal-in{from{opacity:0}
+to{opacity:1}
 }
 .dialog-close{position:absolute;z-index:6;right:14px;top:14px;width:39px;height:39px;display:grid;place-items:center;border:1px solid #ffffff54;background:#090909dd;font-size:22px;transition:background 150ms ease,transform 120ms var(--ease)}
 .dialog-close:hover{background:var(--red);color:#080808}
@@ -212,7 +221,7 @@ to{opacity:1;transform:none}
 
 /* V4: only three selected projects; retain the V3 card dimensions. */
 @media(min-width:1151px){.shell{max-width:none;width:calc(100% - 2 * clamp(24px, 2.5vw, 56px))}
-.grid{grid-template-columns:repeat(3,minmax(0,310px));justify-content:space-between;max-width:1640px;margin-inline:auto;gap:64px clamp(80px,9vw,180px)}
+.grid{grid-template-columns:repeat(3,minmax(0,400px));justify-content:space-between;max-width:1640px;margin-inline:auto;gap:64px clamp(72px,8vw,160px)}
 }
 
 

@@ -31,7 +31,7 @@ img { display: block; max-width: 100%; }
 figure, h1, h2, h3, p { margin: 0; }
 p { color: var(--secundario); }
 [hidden] { display: none !important; }
-.passagem-yoru { display: none; }
+.passagem-yoru, .faixa-yoru { display: none; }
 @media screen {
   body[data-pagina="curriculo"] .passagem-yoru {
     display: block;
@@ -42,69 +42,54 @@ p { color: var(--secundario); }
   .passagem-yoru::before {
     content: ''; position: absolute; inset: 0; pointer-events: none;
     background: url('../assets/images/Fundo2claro.webp') center / cover no-repeat;
-    opacity: 0;
+    opacity: var(--luz-ambiente, 1);
   }
   .passagem-yoru > .shell { position: relative; }
-  .passagem-yoru .project { filter: brightness(.34); }
-  .passagem-yoru[data-fase="fundo"]::before { opacity: 1; }
-  .passagem-yoru[data-fase="fundo"] .project { filter: none; }
+  .passagem-yoru.em-transicao .project { filter: brightness(calc(.35 + .65 * var(--luz-cards))); }
   @media (prefers-reduced-motion: no-preference) {
-    .passagem-yoru[data-fase="fundo"]:not([data-sem-intro])::before {
-      animation: acender-ambiente 1450ms ease-in-out 420ms backwards;
+    body[data-pagina="curriculo"] .faixa-yoru {
+      display: block;
+      height: 72svh;
+      position: relative;
+      background: #000;
     }
-    .passagem-yoru[data-fase="fundo"]:not([data-sem-intro]) .project {
-      animation: iluminar-card 1180ms ease-in-out var(--atraso-luz, 510ms) backwards;
+    .crimson-fundo::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: clamp(200px, 40svh, 520px);
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgb(0 0 0 / 14%) 22%,
+        rgb(0 0 0 / 52%) 54%,
+        rgb(0 0 0 / 90%) 82%,
+        #000
+      );
     }
-    .passagem-yoru .project:nth-child(2) { --atraso-luz: 585ms; }
-    .passagem-yoru .project:nth-child(3) { --atraso-luz: 660ms; }
-    @keyframes acender-ambiente {
-      0% { opacity: 0; }
-      17% { opacity: .32; }
-      29% { opacity: .10; }
-      62% { opacity: .86; }
-      100% { opacity: 1; }
+    .faixa-yoru::after {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      inset: 100% 0 auto;
+      height: 12svh;
+      pointer-events: none;
+      opacity: var(--breu, 0);
+      background: linear-gradient(#000, transparent);
     }
-    @keyframes iluminar-card {
-      0% { filter: brightness(.34); }
-      17% { filter: brightness(.56); }
-      29% { filter: brightness(.44); }
-      75% { filter: brightness(.96); }
-      100% { filter: brightness(1); }
+    .breu-yoru {
+      position: fixed; inset: 0; z-index: 1000;
+      display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center;
+      overflow: hidden; background: #000; pointer-events: none;
+      opacity: var(--breu, 0);
+      visibility: hidden;
     }
-  }
-  .breu-yoru {
-    position: fixed; inset: 0; z-index: 1000;
-    display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center; overflow: hidden;
-    background: #000; opacity: 0; visibility: hidden; pointer-events: none;
-  }
-  .breu-yoru img { width: min(150vw, 175vh); max-width: none; grid-area: 1 / 1; justify-self: center; opacity: 0; }
-  .breu-yoru { transition: opacity 360ms ease-out, visibility 0s 360ms; }
-  .passagem-yoru:is([data-fase="descida"], [data-fase="subida"]) .breu-yoru { visibility: visible; opacity: 1; transition: none; }
-  .passagem-yoru[data-fase="descida"] img { animation: cena-yoru 3.8s both; }
-  .passagem-yoru[data-fase="descida"] .breu-yoru img {
-    pointer-events: auto;
-    cursor: pointer;
-  }
-  .passagem-yoru[data-fase="breu"] .breu-yoru {
-    visibility: visible;
-    animation: breu-projetos 650ms ease-out both;
-  }
-  @keyframes breu-projetos {
-    0% { opacity: 0; }
-    45%, 100% { opacity: 1; }
-  }
-  @keyframes cena-yoru {
-    0%, 22% { opacity: 0; transform: scale(1.06); }
-    42% { opacity: 1; }
-    73% { opacity: 1; }
-    100% { opacity: 0; transform: scale(1.16); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .passagem-yoru[data-fase="descida"] img { animation-name: cena-yoru-reduzida; }
-    @keyframes cena-yoru-reduzida {
-      0%, 22%, 100% { opacity: 0; }
-      42%, 73% { opacity: 1; }
+    .faixa-yoru.em-cena .breu-yoru { visibility: visible; }
+    .breu-yoru img {
+      width: min(150vw, 175vh); max-width: none;
+      opacity: var(--yoru, 0); transform: scale(var(--escala, 1.06));
     }
+    .faixa-yoru.mostra-yoru img { pointer-events: auto; cursor: pointer; }
   }
 }
 .site { max-width: 1160px; margin: auto; padding: 0 32px; }
@@ -164,12 +149,12 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
 .contato-tipo { display: block; color: #aaa99f; font-size: 9px; letter-spacing: 1px; margin-bottom: 3px; }
 .contatos a { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; overflow-wrap: anywhere; }
 .contatos a > span { color: #aaa99f; }
-.logos-tecnologias a { display: block; }
+
 .logos-tecnologias { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; list-style: none; padding: 0; margin: 0; }
 .conhecimentos h3 { color: var(--secundario); font-size: 12px; font-weight: 400; margin-bottom: 12px; }
 .tags { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; padding: 0; margin: 0; }
 .tags li { padding: 4px 9px; border: 1px solid #494945; border-radius: 3px; color: #d2d1ca; font-size: 11px; }
-.conhecimentos .logos-tecnologias + h3 { margin-top: 22px; }
+
 .bloco + .bloco { border-top: 1px solid var(--linha); margin-top: 26px; padding-top: 26px; }
 .bloco h2 { display: flex; align-items: center; gap: 13px; font-size: 19px; font-weight: 600; letter-spacing: -.4px; margin-bottom: 17px; }
 .bloco p { font-size: 13px; line-height: 1.8; }
@@ -396,16 +381,44 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
     row-gap: clamp(56px, 5vw, 88px);
     padding: clamp(30px, 4vw, 64px) var(--margem-curriculo) clamp(44px, 6vw, 96px);
   }
-  #curriculo .curriculo-grid > .bloco { min-width: 0; margin: 0; padding: clamp(20px, 2vw, 34px) clamp(22px, 2.4vw, 40px); border: 0; border-radius: clamp(18px, 1.6vw, 28px); background: rgb(36 36 38 / 72%); }
-  #curriculo .curriculo-grid > .bloco.conhecimentos { padding-block: clamp(26px, 2.4vw, 44px); }
+  #curriculo .curriculo-grid > .bloco { min-width: 0; margin: 0; padding: clamp(18px, 1.8vw, 30px) clamp(20px, 2.2vw, 36px); border: 0; border-radius: clamp(18px, 1.6vw, 28px); background: rgb(36 36 38 / 72%); }
+  #curriculo .curriculo-grid > .bloco.conhecimentos { padding-block: clamp(23px, 2.1vw, 38px); }
+  .conhecimentos .grupo-tecnologias { min-width: 0; }
+  .grupo-tecnologias + .grupo-tecnologias {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #ffffff26;
+  }
   .conhecimentos .logos-tecnologias {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: clamp(6px, .8vw, 15px);
-    justify-items: center;
+    gap: clamp(6px, .7vw, 12px);
   }
-  .conhecimentos .logos-tecnologias li { min-width: 0; }
-  .conhecimentos .logos-tecnologias img { width: clamp(44px, 3.6vw, 66px); height: auto; }
+  .logos-tecnologias li { min-width: 0; }
+  .logos-tecnologias a {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: 6px;
+  }
+  .logos-tecnologias img { width: 100%; max-width: 58px; height: auto; }
+  .logos-tecnologias a:is(:hover, :focus-visible)::after {
+    content: attr(data-nome);
+    position: absolute;
+    z-index: 1;
+    bottom: calc(100% + 7px);
+    inset-inline-start: 0;
+    width: max-content;
+    padding: 5px 8px;
+    border: 1px solid #ffffff26;
+    border-radius: 5px;
+    background: #161618;
+    color: #fff;
+    font: 500 .75rem/1.25 var(--fonte-mono);
+    pointer-events: none;
+  }
+  .logos-tecnologias li:nth-child(n+4) a::after { inset-inline: auto 0; }
   #curriculo .bloco p { max-width: 62ch; font-size: clamp(17px, 1.4vw, 22px); line-height: 1.6; }
   #curriculo .bloco h3 { font-size: clamp(19px, 1.45vw, 24px); line-height: 1.35; margin-bottom: 12px; }
   #curriculo .contato-curriculo > p { margin-top: 20px; }
@@ -432,6 +445,16 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   #curriculo .contatos a { font-size: clamp(16px, 1.35vw, 21px); text-decoration: underline; text-decoration-color: var(--destaque); text-underline-offset: 4px; }
   #curriculo .tags li { font-size: clamp(14px, 1.15vw, 18px); border: 0; border-left: 2px solid var(--destaque); background: #06060666; border-radius: 0; }
   #curriculo .competencias li { font-size: clamp(15px, 1.3vw, 20px); }
+  #curriculo .curriculo-grid > .bloco:last-child { background: transparent; text-align: center; }
+  #curriculo .curriculo-grid > .bloco:last-child h2 {
+    font-size: clamp(23px, 3.35vw, 60px);
+    margin-bottom: clamp(16px, 1.5vw, 28px);
+  }
+  #curriculo .curriculo-grid .competencias {
+    justify-content: center;
+    gap: 12px clamp(18px, 2vw, 36px);
+  }
+  #curriculo .curriculo-grid .competencias li { font-size: clamp(17px, 1.7vw, 30px); }
   #projetos { --destaque: #ff554b; --linha: #414549; background: linear-gradient(115deg, #0c1014ed, #191a1ef5), repeating-linear-gradient(45deg, #777 0 1px,#111 1px 4px); }
   #projetos::before { content: ''; position: absolute; z-index: -1; right: 40px; top: 0; bottom: 0; width: 175px; border-inline: 2px solid #ffffff12; transform: skew(-15deg); background: linear-gradient(90deg,#a92121 0 10%,transparent 10% 18%,#8c211e 18% 21%,transparent 21%); opacity: .4; }
   .vtec-cabecalho { min-height: 410px; padding: 45px 55px; background: linear-gradient(100deg,#101217 50%,transparent), repeating-linear-gradient(0deg, transparent 0 39px,#acbaca0c 40px), repeating-linear-gradient(90deg,transparent 0 39px,#acbaca0c 40px); border-bottom: 6px solid #bd2b25; }
@@ -506,10 +529,11 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   .curriculo-grid > section:last-child { justify-self: center; text-align: center; }
   .curriculo-grid .competencias { justify-content: center; }
   #curriculo .curriculo-grid > .bloco {
-    width: 100%;
+    width: 97%;
     max-width: 100%;
-    padding: clamp(18px, 1.65vw, 28px) clamp(20px, 2vw, 34px);
+    padding: clamp(16px, 1.5vw, 25px) clamp(18px, 1.85vw, 31px);
   }
+  .curriculo-grid > :is(.contato-curriculo, .formacao-curriculo) { justify-self: end; }
   #curriculo .curriculo-grid > section:last-child { width: fit-content; }
   #curriculo .curriculo-grid h2 { margin-bottom: .4em; text-wrap: balance; }
   #curriculo .curriculo-grid h3 { margin-bottom: .3em; }
@@ -519,27 +543,46 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
     #curriculo .conhecimentos {
       display: grid;
       grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-      align-items: center;
+      align-items: start;
       align-content: center;
-      gap: clamp(20px, 2vw, 34px);
+      gap: 12px clamp(26px, 2.8vw, 54px);
     }
-    #curriculo .conhecimentos h2 { grid-column: 1 / -1; }
-    #curriculo .conhecimentos .logos-tecnologias { grid-row: 3; }
-    #curriculo .conhecimentos .logos-tecnologias:last-child { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-    #curriculo .conhecimentos h3 { grid-row: 2; align-self: end; margin: 0; font-size: clamp(17px, 1.25vw, 23px); }
+    #curriculo .conhecimentos h2 {
+      grid-column: 1 / -1;
+      margin-block: -5px 6px;
+      position: relative;
+      inset-block-start: -30px;
+      font-size: clamp(32px, 2.8vw, 52px);
+      letter-spacing: .02em;
+    }
+    #curriculo .conhecimentos h3 { margin-bottom: 10px; font-size: clamp(17px, 1.25vw, 23px); }
+    .grupo-tecnologias + .grupo-tecnologias {
+      position: relative;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    .grupo-tecnologias + .grupo-tecnologias::before {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: max(-27px, -1.4vw);
+      width: 1px;
+      background: #ffffff26;
+    }
+    .grupo-tecnologias:last-child .logos-tecnologias { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     #curriculo .formacao-curriculo { display: flex; flex-direction: column; justify-content: center; }
     .curriculo-grid > .contato-curriculo { grid-column: 8 / -1; }
     .curriculo-grid > .conhecimentos { grid-column: 1 / 8; }
     .curriculo-grid > .formacao-curriculo { grid-column: 8 / -1; }
   }
   @media (prefers-reduced-motion: no-preference) {
-    #curriculo .curriculo-grid > section {
+    #curriculo .curriculo-grid > section:not(:last-child) {
       --angulo: 4deg;
       transform: perspective(1400px) rotateY(calc(var(--angulo) + var(--ajuste, 0deg))) rotateX(var(--vertical, 0deg));
       transition: opacity 400ms ease-out, transform 320ms cubic-bezier(.23, 1, .32, 1);
     }
     #curriculo .curriculo-grid > :is(.contato-curriculo, .formacao-curriculo) { --angulo: -4deg; }
-    #curriculo .curriculo-grid > section:last-child { --angulo: 0deg; }
   }
   #curriculo .bloco h2 { font-size: clamp(24px, 2.3vw, 40px); overflow-wrap: anywhere; }
   #curriculo .bloco p { font-size: clamp(18px, 1.45vw, 24px); }

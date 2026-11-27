@@ -942,6 +942,13 @@
     cursor.setAttribute('aria-hidden', 'true');
     cursor.innerHTML = '<div class="rastro-glow"></div><span class="ponteiro-crimson"><span class="seta-crimson"></span><span class="legenda-cursor"></span></span>';
     document.body.append(cursor);
+    const dialog = document.getElementById('projectDialog');
+    if (dialog) {
+      new MutationObserver(() => {
+        // Modal dialogs render above the document's stacking contexts.
+        (dialog.open ? dialog : document.body).append(cursor);
+      }).observe(dialog, { attributeFilter: ['open'] });
+    }
     const [rastro, ponteiro] = cursor.children;
     const [seta, legenda] = ponteiro.children;
     let desmontarRastro;

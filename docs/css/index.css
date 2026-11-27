@@ -31,12 +31,31 @@ img { display: block; max-width: 100%; }
 figure, h1, h2, h3, p { margin: 0; }
 p { color: var(--secundario); }
 [hidden] { display: none !important; }
-.passagem-yoru { display: none; }
+@property --luz-projetos { syntax: "<number>"; inherits: true; initial-value: 0; }
+.passagem-yoru { display: none; --luz-projetos: 0; }
 @media screen {
   body[data-pagina="curriculo"] .passagem-yoru {
     display: block;
-    height: 100dvh;
-    background: #000 url('../assets/images/Fundo2.png') center / cover no-repeat;
+    min-height: 100dvh;
+    position: relative;
+    background: #000 url('../assets/images/Fundo2escuro.webp') center / cover no-repeat;
+  }
+  .passagem-yoru::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: url('../assets/images/Fundo2claro.webp') center / cover no-repeat;
+    opacity: var(--luz-projetos);
+  }
+  .passagem-yoru > .shell { position: relative; }
+  .passagem-yoru .grid { filter: brightness(calc(.3 + .7 * var(--luz-projetos))); }
+  .passagem-yoru[data-fase="fundo"] { animation: ligar-projetos 920ms ease-out 880ms both; }
+  @keyframes ligar-projetos {
+    0% { --luz-projetos: 0; }
+    23% { --luz-projetos: .78; }
+    48% { --luz-projetos: .14; }
+    100% { --luz-projetos: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .passagem-yoru[data-fase="fundo"] { animation: none; --luz-projetos: 1; }
   }
   .breu-yoru {
     position: fixed; inset: 0; z-index: 1000;
@@ -118,10 +137,12 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
 .contato-tipo { display: block; color: #aaa99f; font-size: 9px; letter-spacing: 1px; margin-bottom: 3px; }
 .contatos a { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; overflow-wrap: anywhere; }
 .contatos a > span { color: #aaa99f; }
+.logos-tecnologias a { display: block; }
+.logos-tecnologias { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; list-style: none; padding: 0; margin: 0; }
 .conhecimentos h3 { color: var(--secundario); font-size: 12px; font-weight: 400; margin-bottom: 12px; }
 .tags { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; padding: 0; margin: 0; }
 .tags li { padding: 4px 9px; border: 1px solid #494945; border-radius: 3px; color: #d2d1ca; font-size: 11px; }
-.conhecimentos .tags + h3 { margin-top: 22px; }
+.conhecimentos .logos-tecnologias + h3 { margin-top: 22px; }
 .bloco + .bloco { border-top: 1px solid var(--linha); margin-top: 26px; padding-top: 26px; }
 .bloco h2 { display: flex; align-items: center; gap: 13px; font-size: 19px; font-weight: 600; letter-spacing: -.4px; margin-bottom: 17px; }
 .bloco p { font-size: 13px; line-height: 1.8; }
@@ -343,16 +364,38 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
     padding: clamp(30px, 4vw, 64px) var(--margem-curriculo) clamp(44px, 6vw, 96px);
   }
   #curriculo .curriculo-grid > .bloco { min-width: 0; margin: 0; padding: clamp(20px, 2vw, 34px) clamp(22px, 2.4vw, 40px); border: 0; border-radius: clamp(18px, 1.6vw, 28px); background: rgb(36 36 38 / 72%); }
+  #curriculo .curriculo-grid > .bloco.conhecimentos { padding-block: clamp(26px, 2.4vw, 44px); }
+  .conhecimentos .logos-tecnologias {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(6px, .8vw, 15px);
+    justify-items: center;
+  }
+  .conhecimentos .logos-tecnologias li { min-width: 0; }
+  .conhecimentos .logos-tecnologias img { width: clamp(44px, 3.6vw, 66px); height: auto; }
   #curriculo .bloco p { max-width: 62ch; font-size: clamp(17px, 1.4vw, 22px); line-height: 1.6; }
   #curriculo .bloco h3 { font-size: clamp(19px, 1.45vw, 24px); line-height: 1.35; margin-bottom: 12px; }
   #curriculo .contato-curriculo > p { margin-top: 20px; }
+  .local-formacao { text-decoration: underline; text-decoration-color: var(--destaque); text-underline-offset: .18em; }
+  .local-formacao span { color: var(--destaque); }
+  #curriculo .formacao .etiqueta {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 10px; padding: 5px 12px;
+    border: 1px solid #ff00375c; border-radius: 999px;
+    background: #34151d; color: #ffe8ed;
+    font: 600 13px/1.3 var(--fonte-mono);
+  }
+  #curriculo .formacao .etiqueta::before {
+    content: ""; width: 10px; height: 10px; border-radius: 50%;
+    box-shadow: inset 3px -2px #ff546f;
+  }
   #curriculo .formacao { flex-wrap: wrap; justify-content: flex-start; gap: 16px; padding-left: 18px; }
   #curriculo .link-texto { font-size: clamp(15px, 1.2vw, 19px); }
   #curriculo .contatos { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
   #curriculo .contatos li { margin: 0; }
   #curriculo .contatos a { width: fit-content; }
   #curriculo .contato-tipo { font-size: 12px; }
-  #curriculo .bloco h2 { display: block; margin-bottom: 20px; font: clamp(30px, 2.9vw, 46px)/1.1 Impact, 'Arial Narrow', sans-serif; text-transform: uppercase; letter-spacing: .5px; color: #dfdfdf; }
+  #curriculo .bloco h2 { display: block; margin-bottom: 20px; font: 600 clamp(24px, 2.3vw, 40px)/1.15 "Akira Expanded Demo", Arial, sans-serif; text-align: center; text-wrap: balance; overflow-wrap: anywhere; text-transform: uppercase; letter-spacing: .5px; color: #dfdfdf; }
   #curriculo .contatos a { font-size: clamp(16px, 1.35vw, 21px); text-decoration: underline; text-decoration-color: var(--destaque); text-underline-offset: 4px; }
   #curriculo .tags li { font-size: clamp(14px, 1.15vw, 18px); border: 0; border-left: 2px solid var(--destaque); background: #06060666; border-radius: 0; }
   #curriculo .competencias li { font-size: clamp(15px, 1.3vw, 20px); }
@@ -420,50 +463,52 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   #scrum h1 > span { font-size: 48px; }
 }
 @media screen and (min-width: 701px) {
-  #curriculo .curriculo-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); padding-inline: clamp(32px, 4.25vw, 115px); }
+  #curriculo .curriculo-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); padding-inline: clamp(32px, 5vw, 115px); gap: clamp(28px, 3vw, 52px); }
   .curriculo-grid > section { grid-column: span 6; }
   .curriculo-grid > section:first-child { grid-column: span 7; }
   .curriculo-grid > .contato-curriculo { grid-column: span 5; }
-  .curriculo-grid > :is(.contato-curriculo, .conhecimentos) { --atraso: 60ms; }
+  .curriculo-grid > :is(.contato-curriculo, .formacao-curriculo) { --atraso: 60ms; }
   .curriculo-grid > section:last-child { grid-column: 1 / -1; }
-  .curriculo-grid { align-items: center; perspective: 1800px; }
+  .curriculo-grid { align-items: stretch; perspective: 1800px; }
   .curriculo-grid > section:last-child { justify-self: center; text-align: center; }
   .curriculo-grid .competencias { justify-content: center; }
   #curriculo .curriculo-grid > .bloco {
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
     padding: clamp(18px, 1.65vw, 28px) clamp(20px, 2vw, 34px);
   }
-  .curriculo-grid > :is(.contato-curriculo, .conhecimentos) { justify-self: end; }
+  #curriculo .curriculo-grid > section:last-child { width: fit-content; }
   #curriculo .curriculo-grid h2 { margin-bottom: .4em; text-wrap: balance; }
   #curriculo .curriculo-grid h3 { margin-bottom: .3em; }
   #curriculo .curriculo-grid .formacao { display: block; }
-  #curriculo .formacao .etiqueta { margin-top: 8px; }
   @media (min-width: 1100px) {
     #curriculo .contatos { display: flex; flex-wrap: wrap; gap: 12px 28px; }
     #curriculo .conhecimentos {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px clamp(16px, 2vw, 32px);
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      align-items: center;
+      align-content: center;
+      gap: clamp(20px, 2vw, 34px);
     }
     #curriculo .conhecimentos h2 { grid-column: 1 / -1; }
-    #curriculo .conhecimentos h3 { grid-row: 2; margin: 0; }
-    #curriculo .conhecimentos .tags { grid-row: 3; align-content: start; }
+    #curriculo .conhecimentos .logos-tecnologias { grid-row: 3; }
+    #curriculo .conhecimentos .logos-tecnologias:last-child { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    #curriculo .conhecimentos h3 { grid-row: 2; align-self: end; margin: 0; font-size: clamp(17px, 1.25vw, 23px); }
+    #curriculo .formacao-curriculo { display: flex; flex-direction: column; justify-content: center; }
     .curriculo-grid > .contato-curriculo { grid-column: 8 / -1; }
-    .curriculo-grid > section:has(.formacao) { grid-column: 1 / 6; }
-    .curriculo-grid > .conhecimentos { grid-column: 7 / -1; }
+    .curriculo-grid > .conhecimentos { grid-column: 1 / 8; }
+    .curriculo-grid > .formacao-curriculo { grid-column: 8 / -1; }
   }
   @media (prefers-reduced-motion: no-preference) {
-    .curriculo-grid > section {
-      --angulo: 8deg;
-      rotate: y calc(var(--angulo) + var(--ajuste, 0deg));
-      transition: rotate 240ms ease-out;
+    #curriculo .curriculo-grid > section {
+      --angulo: 4deg;
+      transform: perspective(1400px) rotateY(calc(var(--angulo) + var(--ajuste, 0deg))) rotateX(var(--vertical, 0deg));
+      transition: opacity 400ms ease-out, transform 320ms cubic-bezier(.23, 1, .32, 1);
     }
-    .curriculo-grid > :is(.contato-curriculo, .conhecimentos) { --angulo: -8deg; }
-    .curriculo-grid > section:last-child { rotate: x 4deg; }
-    .curriculo-grid > section:last-child { rotate: x calc(4deg + var(--ajuste, 0deg)); }
+    #curriculo .curriculo-grid > :is(.contato-curriculo, .formacao-curriculo) { --angulo: -4deg; }
+    #curriculo .curriculo-grid > section:last-child { --angulo: 0deg; }
   }
-  #curriculo .bloco h2 { font-size: clamp(31px, 2.95vw, 52px); overflow-wrap: anywhere; }
+  #curriculo .bloco h2 { font-size: clamp(24px, 2.3vw, 40px); overflow-wrap: anywhere; }
   #curriculo .bloco p { font-size: clamp(18px, 1.45vw, 24px); }
   #curriculo .bloco h3 { font-size: clamp(20px, 1.65vw, 27px); }
   #curriculo :is(.contatos a, .competencias li, .link-texto) { font-size: clamp(17px, 1.4vw, 22px); }
@@ -488,7 +533,7 @@ h1 { font-size: clamp(44px, 5.7vw, 70px); line-height: 1.04; letter-spacing: -3.
   #curriculo .retrato { grid-column: 1 / -1; justify-self: center; width: min(210px, 100%); }
   #curriculo .curriculo-grid { grid-template-columns: minmax(0, 1fr); padding-top: 8px; }
   #curriculo .contatos a { font-size: 14px; }
-  #curriculo .bloco h2 { font-size: 25px; gap: 8px; }
+  #curriculo .bloco h2 { font-size: clamp(17px, 5vw, 25px); gap: 8px; }
   .vtec-cabecalho, .scrum-cabecalho { padding: 32px 24px; }
   .vtec-cabecalho { min-height: 610px; }
   #projetos h1 { width: 100%; max-width: 400px; }

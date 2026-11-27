@@ -26,9 +26,14 @@ for (const bloco of curriculo.querySelectorAll('.curriculo-grid > section')) {
     if (evento.pointerType !== 'mouse' || !permiteGiro.matches) return;
     const area = bloco.getBoundingClientRect();
     const posicao = (evento.clientX - area.left) / area.width - .5;
-    bloco.style.setProperty('--ajuste', `${posicao * 3}deg`);
+    const altura = (evento.clientY - area.top) / area.height - .5;
+    bloco.style.setProperty('--vertical', `${-altura * 4}deg`);
+    bloco.style.setProperty('--ajuste', `${posicao * 5}deg`);
   });
-  bloco.addEventListener('pointerleave', () => bloco.style.removeProperty('--ajuste'));
+  bloco.addEventListener('pointerleave', () => {
+    bloco.style.removeProperty('--ajuste');
+    bloco.style.removeProperty('--vertical');
+  });
 }
 
 function abrirCurriculo() {
@@ -89,6 +94,7 @@ function voltarPeloBreu() {
     window.scrollTo(0, Math.min(window.scrollY, fimDoCurriculo - 4));
     ultimaRolagem = window.scrollY;
     delete passagem.dataset.fase;
+    destacarNavegacao('#curriculo');
   }, 450);
 }
 
@@ -115,23 +121,33 @@ passagem.addEventListener('animationend', evento => {
   passagem.scrollIntoView({ block: 'start', behavior: 'instant' });
   ultimaRolagem = window.scrollY;
   passagem.dataset.fase = 'fundo';
+  destacarNavegacao('#area-projetos');
 });
 window.addEventListener('scroll', acompanharPassagem, { passive: true });
 window.addEventListener('resize', acompanharPassagem);
 
+function destacarNavegacao(hash) {
+  links.forEach(link => {
+    if (link.hash === hash) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+}
+
 function atualizarPagina(evento) {
   if (evento && location.hash === '#conteudo') return;
+  const destinoProjetos = location.hash === "#area-projetos";
   const ativa = paginas.find(pagina => `#${pagina.id}` === location.hash) || paginas[0];
   paginas.forEach(pagina => { pagina.hidden = pagina !== ativa; });
   document.body.dataset.pagina = ativa.id;
   if (ativa === curriculo) abrirCurriculo();
   else retrato.classList.remove('entrada-retrato');
-  links.forEach(link => {
-    if (link.hash === `#${ativa.id}`) link.setAttribute('aria-current', 'page');
-    else link.removeAttribute('aria-current');
-  });
+  destacarNavegacao(destinoProjetos ? "#area-projetos" : `#${ativa.id}`);
   document.title = `${nomes[ativa.id]} — Alef Gabriel`;
-  if (evento) {
+  if (destinoProjetos) {
+    passagem.focus({ preventScroll: true });
+    passagem.scrollIntoView({ block: 'start', behavior: 'instant' });
+    ultimaRolagem = window.scrollY;
+  } else if (evento) {
     (ativa.querySelector('h1') || ativa).focus({ preventScroll: true });
     window.scrollTo(0, 0);
   }
